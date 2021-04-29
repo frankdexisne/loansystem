@@ -297,10 +297,35 @@ class LoanController extends Controller
                 $query->where('lname','LIKE','%'.$request->search_text.'%')->orWhere('fname','LIKE','%'.$request->search_text.'%')->orWhere('mname','LIKE','%'.$request->search_text.'%');
             });
         }
-        if($request->has('area_id')){
-            echo 'search area';
+        if($request->has('table_type')){
+            
+            if($request->table_type=='payment'){
+                
+                if(!$request->has('area_id') && !$request->has('payment_mode_id')){
+                    
+                    return response()->json(['data'=>[]]);
+                    
+                }else{
+                    if($request->has('area_id')){
+                        $client = $client->where('area_id',$request->area_id);
+                        // echo 'true';
+                    }
+                    
+                    
+                }
+            }
         }
-        $data = $client->whereHas('loan')->with(
+        
+        $data = $client->whereHas('loan',function($query) use($request){
+            if($request->has('table_type')){
+                if($request->table_type=='payment'){
+                    if($request->has('payment_mode_id')){
+                        $query->where('payment_mode_id',$request->payment_mode_id);
+                    }
+                }
+            }
+        })
+        ->with(
             [
                 'co_maker'=>function($query){ 
                     $query->with(['co_maker_address'=>function($query){ 

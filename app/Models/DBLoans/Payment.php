@@ -13,7 +13,7 @@ class Payment extends Model
 
     protected $fillable = ['client_id','loan_id','orno','payment_date','amount','ps_id','cbu_id','ins_id'];
 
-    protected $appends = ['payment_date_formatted','amount_formatted','ps_amount','cbu_amount'];
+    protected $appends = ['payment_date_formatted','amount_formatted','ps_amount','cbu_amount','ins_amount'];
 
     public function ps(){
         return $this->hasOne('App\Models\DBLoans\Transaction','id','ps_id');
@@ -21,6 +21,10 @@ class Payment extends Model
 
     public function cbu(){
         return $this->hasOne('App\Models\DBLoans\Transaction','id','cbu_id');
+    }
+
+    public function ins(){
+        return $this->hasOne('App\Models\DBLoans\Transaction','id','ins_id');
     }
 
     public function getPaymentDateFormattedAttribute(){
@@ -37,6 +41,10 @@ class Payment extends Model
 
     public function getCbuAmountAttribute(){
         return $this->ps_id!=null ? number_format($this->ps->amount,2,'.',',') : 0;
+    }
+
+    public function getInsAmountAttribute(){
+        return $this->ins_id!=null ? number_format($this->ins->amount,2,'.',',') : 0;
     }
 
 }

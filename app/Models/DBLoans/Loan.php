@@ -13,7 +13,7 @@ class Loan extends Model
 
     protected $fillable = ['client_id','category_id','term_id','payment_mode_id','status_id','transaction_code','date_loan','date_release','first_payment','maturity_date','loan_amount','interest','settled','balance','over','payment_per_sched','byout_of'];
 
-    protected $appends = ['date_loan_formatted','date_release_formatted','first_payment_formatted','maturity_date_formatted','loan_amount_formatted'];
+    protected $appends = ['date_loan_formatted','date_release_formatted','first_payment_formatted','maturity_date_formatted','loan_amount_formatted','balance_formatted'];
 
     public function client(){
         return $this->belongsTo('App\Models\DBLoans\Client');
@@ -63,6 +63,10 @@ class Loan extends Model
 
     public function getLoanAmountFormattedAttribute(){
         return number_format($this->loan_amount,2,'.',',');
+    }
+
+    public function getBalanceFormattedAttribute(){
+        return number_format($this->balance,2,'.',',');
     }
     
 }

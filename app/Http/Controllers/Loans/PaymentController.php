@@ -159,10 +159,20 @@ class PaymentController extends Controller
     public function jsonData(Request $request){
         $data = Loan::whereHas('status',function($query){ $query->where('name','RELEASED'); })
                     ->whereHas('payment',function($query) use($request){
-                        $query->where('payment_date',$request->payment_date);
+                        if($request->has('payment_date')){
+                            $query->where('payment_date',$request->payment_date);
+                        }   
                     })
-                    ->with('payment')
+                    ->with(['payment'=>function($query) use($request){
+                        if($request->has('payment_date')){
+                            $query->where('payment_date',$request->payment_date);
+                        }   
+                    },'client'])
                     ->get();
         return LoanResource::collection($data);
+
+        // $data = Payment::whereHas('loan',function($query) use($request){
+        //                     $query->whereHas()
+        //                 })
     }
 }
