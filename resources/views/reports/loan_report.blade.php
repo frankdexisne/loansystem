@@ -21,30 +21,26 @@
         <a href="#">Home</a>
     </li>
     <li><a href="#">Reports</a></li>
-    <li class="active">Loan Report</li>
+    <li class="active">Sales Report</li>
 </ul>
 
 <div class="nav-search" id="nav-search">
     <form id="form-search" class="form-inline">
         <div class="form-group">
             <label for="">Area</label>
-            <select name="area_id" id="" class="form-control">
+            <select name="area_id" class="form-control">
                 
             </select>
         </div>
         <div class="form-group">
-            <label for="">Month</label>
-            <input type="month" class="form-control" name="cutoff_month" value="{{date('Y-m')}}" required>
+            <label for="">Date Range: </label>
+            <input type="date" class="form-control" name="start_date" value="{{date('Y-m-d')}}" required>
         </div>
         <div class="form-group">
-            <label for="">Cutoff</label>
-            <select name="cutoff_date" id="" class="form-control">
-                <option value="07">07</option>
-                <option value="15">15</option>
-                <option value="23">23</option>
-                <option value="t">Last day</option>
-            </select>
+            <label for=""> - </label>
+            <input type="date" class="form-control" name="end_date" value="{{date('Y-m-d')}}" required>
         </div>
+        
         <div class="form-group">
             <div class="btn-group">
                 <button type="submit" class="btn btn-sm btn-success"><i class="ace-icon fa fa-search"></i> Search</button>
@@ -99,6 +95,8 @@
 <script src="{{asset('/ace-master')}}/js/jquery.dataTables.min.js"></script>
 <script src="{{asset('/ace-master')}}/js/jquery.dataTables.bootstrap.min.js"></script>
 <script src="{{asset('/ace-master')}}/js/dataTables.buttons.min.js"></script>
+<script src="{{asset('/ace-master')}}/js/dataTables.rowGroup.min.js"></script>
+<script src="{{asset('/ace-master')}}/js/dataTables.checkboxes.min.js"></script>
 <script src="{{asset('/ace-master')}}/js/buttons.flash.min.js"></script>
 <script src="{{asset('/ace-master')}}/js/buttons.html5.min.js"></script>
 <script src="{{asset('/ace-master')}}/js/buttons.print.min.js"></script>
@@ -125,64 +123,106 @@ $(document).ready(function(){
         }
     })
 
+    $start_date = $('#form-search').find('input[name="start_date"]');
+    $end_date = $('#form-search').find('input[name="end_date"]');
+    $area_id = $('#form-search').find('select[name="area_id"]');
+
+    $start_date.on('change',function(e){
+        e.preventDefault();
+        $this = $(this);
+        if($start_date.val()>$end_date.val()){
+            $end_date.val($start_date.val());
+        }
+    })
+
+    $end_date.on('change',function(e){
+        e.preventDefault();
+        $this = $(this);
+        if($end_date.val()<$start_date.val()){
+            $start_date.val($end_date.val());
+        }
+    })
+
     function generateReport(){
         if($.fn.DataTable.isDataTable('#table-report')){
             $('#table-report').DataTable().destroy();    
         }
         var tableReport = $('#table-report').DataTable({
             ajax: {
-                url: "{{route('reports.ncr-json')}}",
+                url: "{{route('reports.sr-json')}}",
                 type: "GET",
                 data: {
-                    cutoff_month : $('#form-search input[name="cutoff_month"]').val(),
-                    cutoff_date : $('#form-search select[name="cutoff_date"]').val(),
-                    area_id : $('#form-search select[name="area_id"]').val()
+                    start_date : $start_date.val(),
+                    end_date : $end_date.val(),
+                    area_id : $area_id.val()
                 }
             },
-            
-            columnDefs: [
-                {width: '20%', targets: [0]},
-                {width: '5%', targets: [1,2,3,4,5,6,7,8]}
-
-            ],
+            processing: true,
+            language: {
+                infoFiltered:"",
+                processing: '<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only">Loading...</span>'
+            },
             columns: [
-                
                 {data: null,render(data,type){
                     return '';
                 }},
+                {data: 'client.full_name'},
+                {data: 'loan_amount_formatted'},
+                {data: 'balance_formatted'},
                 {data: null,render(data,type){
-                    return '';
+                    return parseFloat(data['loan_amount']) * (parseFloat(data['interest'])/100);
                 }},
-                {data: 'client_name'},
+                {data: 'deduction_formatted'},
                 {data: null,render(data,type){
-                    return '';
-                }},
-                {data: null,render(data,type){
-                    return '';
-                }},
-                {data: null,render(data,type){
-                    return '';
+                    return data['byout'].length > 0 ? data['total_byout_formatted'] : null;
                 }},
                 {data: null,render(data,type){
-                    return '';
-                }},
-                {data: null,render(data,type){
-                    return '';
-                }},
-                {data: null,render(data,type){
-                    return '';
-                }},
-                {data: null,render(data,type){
-                    return '';
+                    return parseFloat(data['loan_amount'])-parseFloat(data['deduction_formatted'].replace(',',''));
                 }}
             ],
+            // rowGroup: {
+            //     dataSrc: 'payment_date',
+            //     startRender: function ( rows, group ) {
+            //         var groupName = 'group-' + group.replace(/[^A-Za-z0-9]/g, '');
+            //         var rowNodes = rows.nodes();
+            //         rowNodes.to$().addClass(groupName);
+                    
+            //         // Get selected checkboxes
+            //         // var checkboxesSelected = $('.dt-checkboxes:checked', rowNodes);
+                    
+            //         // // Parent checkbox is selected when all child checkboxes are selected
+            //         // var isSelected = (checkboxesSelected.length == rowNodes.length);
+                    
+            //         // var collapsed = !!collapsedGroups[group];
+            //         // rows.nodes().each(function(r) {
+            //         // r.style.display = 'none';
+            //         // if (collapsed) {
+            //         //     r.style.display = '';
+            //         // }
+            //         // });
+
+            //         // return '<label><input type="checkbox" class="group-checkbox" data-group-name="' 
+            //         //     + groupName + '"' + (isSelected ? ' checked' : '') +'> ' + group + ' (' + rows.count() + ' waybills)</label>';
+            //         return $('<tr/>')
+            //             .append('<td colspan="8"><a href="#">' + group + ' (' + rows.count() + ' payments)</a></td>')
+            //             .attr('data-name', group);
+            //             // .toggleClass('collapsed', collapsed);
+            //     }
+            // },
             initComplete: function(datatable,ajax){
-                
+                if(tableReport.data().length>0){
+                    $('#table-report').find('tfoot').removeAttr('style');
+                }else{
+                    $('#table-report').find('tfoot').attr('style','display:none;');
+                }
             }
         });
 
         $.fn.dataTable.Buttons.defaults.dom.container.className = 'dt-buttons btn-overlap btn-group btn-overlap';
-				
+        function formatDate(dateString){
+            var d = dateString.split("-");
+            return d[1]+'/'+d[2]+'/'+d[0]; 
+        }
         new $.fn.dataTable.Buttons( tableReport, {
             buttons: [
                 
@@ -205,19 +245,36 @@ $(document).ready(function(){
                 "extend": "print",
                 "text": "<i class='fa fa-print bigger-110 grey'></i> <span class='hidden'>Print</span>",
                 "className": "btn btn-white btn-primary btn-bold",
-                autoPrint: false,
+                orientation: 'landscape',
+                pageSize: 'LEGAL',
+                autoPrint: true,
                 exportOptions: {
                     // columns: ':visible'
                 },
                 customize: function (win) {
+                    var image_path = "{{asset(env('APP_LOGO'))}}";
+                    var start = formatDate($start_date.val());
+                    var end = formatDate($end_date.val());
+                    $(win.document.body).css('font-size','10pt')
+                                        .prepend('<img src="'+image_path+'" style="width:70px; height:70px;"><h2 style="position:absolute; top:0; left:80px;">Sales Report</h2><font style="font-size:10px;position:absolute;top:50px;left:80px;">Date : '+start+' - '+end+'</font>');
+                                                            
                     $(win.document.body).find('table').addClass('display').css('font-size', '9px');
-                    // $(win.document.body).find('tr:nth-child(odd) td').each(function(index){
-                    //     $(this).css('background-color','#D0D0D0');
-                    // });
+                    $(win.document.body).find('tr:nth-child(odd) td').each(function(index){
+                        $(this).css('background-color','#D0D0D0');
+                    });
+                    $(win.document.body).append('<br><br><br><br><br><table width="100%">'+
+                                                    '<tr>'+
+                                                        '<td width="5%"></td>'+
+                                                        '<td width="35%" align="center" style="border-top: 1px solid #000;">Collector</td>'+
+                                                        '<td width="20%"></td>'+
+                                                        '<td width="35%" align="center" style="border-top: 1px solid #000;">Cashier</td>'+
+                                                        '<td width="5%"></td>'+
+                                                    '</tr>'+
+                                                '</table>'
+                                                )
                     // $(win.document.body).find('h1').css('text-align','center');
                 },
-                title: 'Loan Report',
-                message: 'Cutoff : '+$('#form-search').find('input[name="cutoff_month"]').val()+'-'+$('#form-search').find('select[name="cutoff_date"]').find('option:selected').text()
+                title: ''
                 }		  
             ]
         } );

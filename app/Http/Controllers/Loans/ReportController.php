@@ -317,16 +317,19 @@ class ReportController extends Controller
     }
 
     public function sr_json(Request $request){
-        $data = Loan::whereBetween('release_date',[$request->start_date,$request->end_date])
+        $data = Loan::whereBetween('date_release',[$request->start_date,$request->end_date])
+                    ->where('status_id',6)
                        ->whereHas('client')
                        ->with([
                             'client'=>function($query) use($request){
+                                $query->with(['area','loan']);
                                 if($request->has('area_id')){
                                     $query->where('area_id',$request->area_id);
                                 }
                             }
                        ])
                        ->get();
+        
         return response()->json(['data'=>$data->toArray()]);
     }
 
@@ -335,14 +338,17 @@ class ReportController extends Controller
     }
 
     public function lr_json(Request $request){
-        $data = Loan::whereBetween('release_date',[$request->start_date,$request->end_date])
+        $data = Loan::whereBetween('date_release',[$request->start_date,$request->end_date])
+                    ->where('status_id',6)
                        ->whereHas('client')
                        ->with([
                             'client'=>function($query) use($request){
+                                $query->with(['area','loan']);
                                 if($request->has('area_id')){
                                     $query->where('area_id',$request->area_id);
                                 }
-                            }
+                            },
+                            'byout'
                        ])
                        ->get();
         return response()->json(['data'=>$data->toArray()]);
@@ -360,6 +366,9 @@ class ReportController extends Controller
                                 if($request->has('area_id')){
                                     $query->where('area_id',$request->area_id);
                                 }
+                            },
+                            'transaction'=>function($query){
+                                $query->with('wallet');
                             }
                        ])
                        ->get();

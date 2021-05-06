@@ -156,27 +156,16 @@ $(document).ready(function(){
                 }
             },
             columns: [
-                {data: 'payment_date_formatted'},
+                {data:null,render(data,type){
+                    return '';
+                }},
+                {data: 'reference_no'},
                 {data: 'client.full_name'},
                 {data: 'client.full_address'},
                 {data: null,render(data,type){
-                    return data['ps_id']!=null ? data['ps_amount'] : null;
+                    return data['transaction']['wallet']['name'];
                 }},
-                {data: null,render(data,type){
-                    return data['cbu_id']!=null ? data['cbu_amount'] : null;
-                }},
-                {data: 'penalty',render(data,type){
-                    return data!=0 ? data : null;
-                }},
-                {data: null,render(data,type){
-                    return data['loan_id']!=null ? data['amount_formatted'] : null;
-                }},
-                {data: null,render(data,type){
-                    var ps = data['ps_id']!=null ? data['ps']['amount'] : 0;
-                    var cbu = data['cbu_id']!=null ? data['cbu']['amount'] : 0;
-                    return parseFloat(data['amount'])+parseFloat(ps)+parseFloat(cbu)+parseFloat(data['penalty']);
-                }},
-                {data: 'orno'}
+                {data: 'amount'}
             ],
             // rowGroup: {
             //     dataSrc: 'payment_date',
@@ -245,7 +234,7 @@ $(document).ready(function(){
                 "className": "btn btn-white btn-primary btn-bold",
                 orientation: 'landscape',
                 pageSize: 'LEGAL',
-                autoPrint: false,
+                autoPrint: true,
                 exportOptions: {
                     // columns: ':visible'
                 },
@@ -254,7 +243,7 @@ $(document).ready(function(){
                     var start = formatDate($start_date.val());
                     var end = formatDate($end_date.val());
                     $(win.document.body).css('font-size','10pt')
-                                        .prepend('<img src="'+image_path+'" style="width:70px; height:70px;"><h2 style="position:absolute; top:0; left:80px;">Collection Report</h2><font style="font-size:10px;position:absolute;top:50px;left:80px;">Date : '+start+' - '+end+'</font>');
+                                        .prepend('<img src="'+image_path+'" style="width:70px; height:70px;"><h2 style="position:absolute; top:0; left:80px;">Withdrawal Report</h2><font style="font-size:10px;position:absolute;top:50px;left:80px;">Date : '+start+' - '+end+'</font>');
                                                             
                     $(win.document.body).find('table').addClass('display').css('font-size', '9px');
                     $(win.document.body).find('tr:nth-child(odd) td').each(function(index){

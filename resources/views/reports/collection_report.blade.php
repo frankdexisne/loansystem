@@ -171,6 +171,11 @@ $(document).ready(function(){
                     area_id : $area_id.val()
                 }
             },
+            processing: true,
+            language: {
+                infoFiltered:"",
+                processing: '<i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="sr-only">Loading...</span>'
+            },
             columns: [
                 {data: 'payment_date_formatted'},
                 {data: 'client.full_name'},
@@ -261,7 +266,7 @@ $(document).ready(function(){
                 "className": "btn btn-white btn-primary btn-bold",
                 orientation: 'landscape',
                 pageSize: 'LEGAL',
-                autoPrint: false,
+                autoPrint: true,
                 exportOptions: {
                     // columns: ':visible'
                 },
