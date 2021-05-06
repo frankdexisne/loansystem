@@ -70,12 +70,12 @@ return [
                 'icon'=>'menu-icon fa fa-file',
                 'permission_name'=>'reports.index',
             ],
-            [
-                'name'=>'Expenses Report',
-                'route_name'=>'reports.er',
-                'icon'=>'menu-icon fa fa-file',
-                'permission_name'=>'reports.index',
-            ],
+            // [
+            //     'name'=>'Expenses Report',
+            //     'route_name'=>'reports.er',
+            //     'icon'=>'menu-icon fa fa-file',
+            //     'permission_name'=>'reports.index',
+            // ],
         ],
         'permissions_name'=>'reports.index',
     ],
