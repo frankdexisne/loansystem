@@ -21,7 +21,7 @@
         <a href="#">Home</a>
     </li>
     <li><a href="#">Reports</a></li>
-    <li class="active">Collection Schedule</li>
+    <li class="active">Expense Report</li>
 </ul>
 
 <div class="nav-search" id="nav-search">
@@ -73,14 +73,11 @@
             <table class="table table-bordered" id="table-report" width="100%">
                 <thead>                  
                     <tr>
-                        <th>Name</th>
-                        <th>Address</th>
-                        <th>PS</th>
-                        <th>CBU</th>
-                        <th>Penalty</th>
+                        <th></th>
+                        <th>OR</th>
+                        <th>Description</th>
+                        <th>Category</th>
                         <th>Amount</th>
-                        <th>Total</th>
-                        <th>OR #</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -130,43 +127,36 @@ $(document).ready(function(){
             $('#table-report').DataTable().destroy();    
         }
         var tableReport = $('#table-report').DataTable({
-            // ajax: {
-            //     url: "{{route('reports.ncr-json')}}",
-            //     type: "GET",
-            //     data: {
-            //         cutoff_month : $('#form-search input[name="cutoff_month"]').val(),
-            //         cutoff_date : $('#form-search select[name="cutoff_date"]').val(),
-            //         area_id : $('#form-search select[name="area_id"]').val()
-            //     }
-            // },
+            ajax: {
+                url: "{{route('reports.ncr-json')}}",
+                type: "GET",
+                data: {
+                    cutoff_month : $('#form-search input[name="cutoff_month"]').val(),
+                    cutoff_date : $('#form-search select[name="cutoff_date"]').val(),
+                    area_id : $('#form-search select[name="area_id"]').val()
+                }
+            },
             
             columnDefs: [
-                {width: '20%', targets: [0,1]}
+                {width: '20%', targets: [0]},
+                {width: '5%', targets: [1,2,3,4,5,6,7,8]}
 
             ],
             columns: [
                 
-                {data: 'client_name'},
-                {data: 'address'},
-                {data: null,render(data,type){
+                {data: null, render(data,type){
                     return '';
                 }},
-                {data: null,render(data,type){
+                {data: null, render(data,type){
                     return '';
                 }},
-                {data: null,render(data,type){
+                {data: null, render(data,type){
                     return '';
                 }},
-                {data: null,render(data,type){
+                {data: null, render(data,type){
                     return '';
                 }},
-                {data: null,render(data,type){
-                    return '';
-                }},
-                {data: null,render(data,type){
-                    return '';
-                }},
-                {data: null,render(data,type){
+                {data: null, render(data,type){
                     return '';
                 }}
             ],
@@ -210,7 +200,7 @@ $(document).ready(function(){
                     // });
                     // $(win.document.body).find('h1').css('text-align','center');
                 },
-                title: 'Collection Report',
+                title: 'Expense Report',
                 message: 'Cutoff : '+$('#form-search').find('input[name="cutoff_month"]').val()+'-'+$('#form-search').find('select[name="cutoff_date"]').find('option:selected').text()
                 }		  
             ]

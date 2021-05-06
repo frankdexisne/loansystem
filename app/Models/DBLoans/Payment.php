@@ -15,6 +15,14 @@ class Payment extends Model
 
     protected $appends = ['payment_date_formatted','amount_formatted','ps_amount','cbu_amount','ins_amount'];
 
+    public function loan(){
+        return $this->belongsTo('App\Models\DBLoans\Loan');
+    }
+
+    public function client(){
+        return $this->belongsTo('App\Models\DBLoans\Client');
+    }
+
     public function ps(){
         return $this->hasOne('App\Models\DBLoans\Transaction','id','ps_id');
     }

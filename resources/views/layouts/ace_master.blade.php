@@ -152,7 +152,7 @@
                                     @foreach($menu['sub_menu'] as $submenu)
                                         @can($submenu['permission_name'])
                                             <li class="{{Route::currentRouteName()==$submenu['route_name']? 'active' : ''}}">
-                                                <a href="{{route($submenu['route_name'])}}">
+                                                <a href="{{$submenu['route_name']!=='#' ? route($submenu['route_name']) : '#'}}">
                                                     <i class="menu-icon fa fa-caret-right"></i>
                                                     {{$submenu['name']}}
                                                 </a>

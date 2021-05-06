@@ -26,8 +26,8 @@ class PaymentRequest extends FormRequest
         return [
             'orno'=>'required|unique:mysql.payments,orno,'.$this->id,
             'payment_date'=>'required|date',
-            'ps'=>'required|numeric',
-            'cbu'=>'required|numeric'
+            'ps'=>$this->has('with_savings') ? 'required|numeric' : '',
+            'cbu'=>$this->has('with_savings') ? 'required|numeric' : ''
         ];
     }
 }

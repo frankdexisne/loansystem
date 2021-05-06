@@ -15,7 +15,7 @@ class Client extends Model
 
     protected $fillable = ['account_no','lname','fname','mname','dob','gender','contact_no','company','position','monthly_salary','area_id'];
     
-    protected $appends = ['personal_saving','capital_build_up','loan_balance'];
+    protected $appends = ['personal_saving','capital_build_up','loan_balance','full_address','full_name'];
 
     public function address(){
         return $this->hasOne('App\Models\DBLoans\Address');
@@ -39,6 +39,14 @@ class Client extends Model
 
     public function getCapitalBuildUpAttribute(){
         return $this->hasWallet('cbu') ? $this->getWallet('cbu')->balance : 0;
+    }
+
+    public function getFullNameAttribute(){
+        return $this->lname.', '.$this->fname.' '.$this->mname;
+    }
+
+    public function getFullAddressAttribute(){
+        return $this->address==null ? null : $this->address->street.' '.$this->address->philippine_barangay->barangay_description.', '.$this->address->philippine_barangay->philippine_city->city_municipality_description.', '.$this->address->philippine_barangay->philippine_province->province_description;
     }
 
     public function loan(){

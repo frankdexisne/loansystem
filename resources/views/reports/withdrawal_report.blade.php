@@ -21,7 +21,7 @@
         <a href="#">Home</a>
     </li>
     <li><a href="#">Reports</a></li>
-    <li class="active">Collection Report</li>
+    <li class="active">Withdrawal Report</li>
 </ul>
 
 <div class="nav-search" id="nav-search">
@@ -69,30 +69,14 @@
             <table class="table table-bordered" id="table-report" width="100%">
                 <thead>                  
                     <tr>
-                        <th>Date</th>
+                        <th>#</th>
+                        <th>Ref #</th>
                         <th>Name</th>
                         <th>Address</th>
-                        <th>PS</th>
-                        <th>CBU</th>
-                        <th>Penalty</th>
+                        <th>Type</th>
                         <th>Amount</th>
-                        <th>Total</th>
-                        <th>OR #</th>
                     </tr>
                 </thead>
-                <tfoot style="display:none;">                  
-                    <tr>
-                        <th></th>
-                        <th></th>
-                        <th></th>
-                        <th class="ps-total"></th>
-                        <th class="cbu-total"></th>
-                        <th class="cbu-penalty"></th>
-                        <th class="amount-total"></th>
-                        <th class="overall-total"></th>
-                        <th></th>
-                    </tr>
-                </tfoot>
                 <tbody>
                     
                 </tbody>
@@ -163,7 +147,7 @@ $(document).ready(function(){
         }
         var tableReport = $('#table-report').DataTable({
             ajax: {
-                url: "{{route('reports.cr-json')}}",
+                url: "{{route('reports.wr-json')}}",
                 type: "GET",
                 data: {
                     start_date : $start_date.val(),

@@ -47,12 +47,29 @@ Route::get('loans/soa/{id}',[App\Http\Controllers\Loans\LoanController::class,'s
 Route::resource('payments',App\Http\Controllers\Loans\PaymentController::class);
 Route::resource('deposits',App\Http\Controllers\Loans\DepositController::class);
 Route::resource('withdraws',App\Http\Controllers\Loans\WithdrawController::class);
-Route::resource('reports',App\Http\Controllers\Loans\ReportController::class);
+
 
 Route::post('employees/add-user',[App\Http\Controllers\Payroll\EmployeeController::class,'addUser'])->name('employees.addUser');
 Route::post('employees/assign',[App\Http\Controllers\Payroll\EmployeeController::class,'assign'])->name('employees.assign');
 Route::post('users/assign-role',[App\Http\Controllers\System\UserController::class,'assignRole'])->name('users.assign-role');
 
+Route::get('/reports/note-collection-report',[App\Http\Controllers\Loans\ReportController::class,'ncr'])->name('reports.ncr');
+Route::get('/reports/target-performance-report',[App\Http\Controllers\Loans\ReportController::class,'tpr'])->name('reports.tpr');
+Route::get('/reports/collection-report',[App\Http\Controllers\Loans\ReportController::class,'cr'])->name('reports.cr');
+Route::get('/reports/sales-report',[App\Http\Controllers\Loans\ReportController::class,'sr'])->name('reports.sr');
+Route::get('/reports/loan-report',[App\Http\Controllers\Loans\ReportController::class,'lr'])->name('reports.lr');
+Route::get('/reports/withdrawal-report',[App\Http\Controllers\Loans\ReportController::class,'wr'])->name('reports.wr');
+Route::get('/reports/expense-report',[App\Http\Controllers\Loans\ReportController::class,'er'])->name('reports.er');
+
+Route::get('/reports/note-collection-report-json',[App\Http\Controllers\Loans\ReportController::class,'ncr_json'])->name('reports.ncr-json');
+Route::get('/reports/target-performance-report-json',[App\Http\Controllers\Loans\ReportController::class,'tpr_json'])->name('reports.tpr-json');
+Route::get('/reports/collection-report-json',[App\Http\Controllers\Loans\ReportController::class,'cr_json'])->name('reports.cr-json');
+Route::get('/reports/sales-report-json',[App\Http\Controllers\Loans\ReportController::class,'sr_json'])->name('reports.sr-json');
+Route::get('/reports/loan-report-json',[App\Http\Controllers\Loans\ReportController::class,'lr_json'])->name('reports.lr-json');
+Route::get('/reports/withdrawal-report-json',[App\Http\Controllers\Loans\ReportController::class,'wr_json'])->name('reports.wr-json');
+Route::get('/reports/expense-report-json',[App\Http\Controllers\Loans\ReportController::class,'er_json'])->name('reports.er-json');
+
+Route::resource('reports',App\Http\Controllers\Loans\ReportController::class);
 
 Route::get('/references', function () {
     
@@ -108,3 +125,4 @@ Auth::routes();
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 Route::get('/profile', [App\Http\Controllers\HomeController::class, 'profile'])->name('profile');
+

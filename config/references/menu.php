@@ -23,19 +23,62 @@ return [
                 'route_name'=>'payments.index',
                 'icon'=>'menu-icon fa fa-money',
                 'permission_name'=>'payments.index',
-            ],
-            [
-                'name'=>'Reports',
-                'route_name'=>'reports.index',
-                'icon'=>'menu-icon fa fa-file',
-                'permission_name'=>'reports.index',
             ]
             
 
         ],
         'permissions_name'=>'clients.index|loans.index',
     ],
-    
+    [
+        'name'=>'Reports',
+        'url'=>'#',
+        'icon'=>'menu-icon fa  fa-bar-chart-o',
+        'sub_menu'=>[
+            [
+                'name'=>'Note Collection Report (Daily)',
+                'route_name'=>'reports.ncr',
+                'icon'=>'menu-icon fa fa-file',
+                'permission_name'=>'reports.index',
+            ],
+            // [
+            //     'name'=>'Target Performance Report (Daily)',
+            //     'route_name'=>'reports.tpr',
+            //     'icon'=>'menu-icon fa fa-file',
+            //     'permission_name'=>'reports.index',
+            // ],
+            [
+                'name'=>'Collection Report (Weekly/Semi-Monthly/Monthly)',
+                'route_name'=>'reports.cr',
+                'icon'=>'menu-icon fa fa-file',
+                'permission_name'=>'reports.index',
+            ],
+            [
+                'name'=>'Sales Report (Weekly/Semi-Monthly/Monthly)',
+                'route_name'=>'reports.sr',
+                'icon'=>'menu-icon fa fa-file',
+                'permission_name'=>'reports.index',
+            ],
+            [
+                'name'=>'Loan Report (Weekly/Semi-Monthly/Monthly)',
+                'route_name'=>'reports.lr',
+                'icon'=>'menu-icon fa fa-file',
+                'permission_name'=>'reports.index',
+            ],
+            [
+                'name'=>'Withdrawal Report (Weekly/Semi-Monthly/Monthly)',
+                'route_name'=>'reports.wr',
+                'icon'=>'menu-icon fa fa-file',
+                'permission_name'=>'reports.index',
+            ],
+            [
+                'name'=>'Expenses Report',
+                'route_name'=>'reports.er',
+                'icon'=>'menu-icon fa fa-file',
+                'permission_name'=>'reports.index',
+            ],
+        ],
+        'permissions_name'=>'reports.index',
+    ],
 
     [
         'name'=>'References',

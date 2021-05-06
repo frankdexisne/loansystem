@@ -317,12 +317,15 @@ class LoanController extends Controller
         }
         
         $data = $client->whereHas('loan',function($query) use($request){
+            
             if($request->has('table_type')){
                 if($request->table_type=='payment'){
                     if($request->has('payment_mode_id')){
-                        $query->where('payment_mode_id',$request->payment_mode_id);
+                        $query->where('payment_mode_id',$request->payment_mode_id)->where('status_id',6);
                     }
                 }
+            }else{
+                $query->where('status_id','<>',7);
             }
         })
         ->with(
