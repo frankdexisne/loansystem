@@ -36,9 +36,9 @@ class CheckWorkStation
                     'encrypted_ws'=>Crypt::encrypt($code_generated)
                 ])->save();
             }
-            return response(view('workstation',compact('code_generated','workstation')),200)->cookie('workstation',Crypt::encrypt($code_generated));
-            // return response(view('workstation',compact('code_generated','workstation')),200)
-            //                 ->withCookie(cookie()->forever('workstation', $this->encrypt_decrypt('encrypt',$code_generated)))
+            // return response(view('workstation',compact('code_generated','workstation')),200)->cookie('workstation',Crypt::encrypt($code_generated));
+            return response(view('workstation',compact('code_generated','workstation')),200)
+                            ->withCookie(cookie()->forever('workstation', Crypt::encrypt($code_generated)));
             
         }else{
             $code_generated = Crypt::decrypt(Cookie::get('workstation'));
