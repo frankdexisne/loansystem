@@ -7,6 +7,9 @@
         <i class="ace-icon fa fa-home home-icon"></i>
         <a href="#">Home</a>
     </li>
+    <li>
+        <a href="#">System Libraries</a>
+    </li>
     <li class="active">Payments</li>
 </ul>
 @endsection

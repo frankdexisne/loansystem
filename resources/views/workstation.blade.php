@@ -1,73 +1,129 @@
-
 <!DOCTYPE html>
 <html lang="en">
-	
-  <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <!-- Meta, title, CSS, favicons, etc. -->
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+	<head>
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+		<meta charset="utf-8" />
+		<title>{{env('APP_ALIAS')}}</title>
 
-    <title>Loan System | Workstation </title>
+		<meta name="description" content="" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+		<!-- CSRF Token -->
+		<meta name="csrf-token" content="{{ csrf_token() }}">
+		<!-- bootstrap & fontawesome -->
+		<link rel="stylesheet" href="{{asset('ace-master')}}/css/bootstrap.min.css" />
+		<link rel="stylesheet" href="{{asset('ace-master')}}/font-awesome/4.5.0/css/font-awesome.min.css" />
 
-    <!-- Bootstrap -->
-    <link href="{{asset('/gentelella/workstation')}}/vendors/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Font Awesome -->
-    <link href="{{asset('/gentelella/workstation')}}/vendors/font-awesome/css/font-awesome.min.css" rel="stylesheet">
+		<!-- page specific plugin styles -->
 
-    <!-- Custom Theme Style -->
-    <link href="{{asset('/gentelella/workstation')}}/css/custom.css" rel="stylesheet">
-	
-	<script type="text/javascript" src="{{asset('/gentelella/workstation')}}/loader/js/jquery.min.js"></script>
-	<script type="text/javascript" language="javascript">
+		<!-- text fonts -->
+		<link rel="stylesheet" href="{{asset('ace-master')}}/css/fonts.googleapis.com.css" />
+
+		<!-- ace styles -->
+		<link rel="stylesheet" href="{{asset('ace-master')}}/css/ace.min.css" class="ace-main-stylesheet" id="main-ace-style" />
+
+		<!--[if lte IE 9]>
+			<link rel="stylesheet" href="assets/css/ace-part2.min.css" class="ace-main-stylesheet" />
+		<![endif]-->
+		<link rel="stylesheet" href="{{asset('ace-master')}}/css/ace-skins.min.css" />
+		<link rel="stylesheet" href="{{asset('ace-master')}}/css/ace-rtl.min.css" />
+
+		<!--[if lte IE 9]>
+		  <link rel="stylesheet" href="{{asset('ace-master')}}/css/ace-ie.min.css" />
+		<![endif]-->
+
+		<!-- inline styles related to this page -->
+
+		<!-- ace settings handler -->
+		<script src="{{asset('ace-master')}}/js/ace-extra.min.js"></script>
+
+		<!-- HTML5shiv and Respond.js for IE8 to support HTML5 elements and media queries -->
+
+		<!--[if lte IE 8]>
+		<script src="{{asset('ace-master')}}/js/html5shiv.min.js"></script>
+		<script src="{{asset('ace-master')}}/js/respond.min.js"></script>
+        <![endif]-->
+	</head>
+
+	<body class="no-skin">
+  <div class="main-content">
+				<div class="main-content-inner">
+					
+
+					<div class="page-content">
+						
+
+						<div class="row">
+							<div class="col-xs-12">
+								<!-- PAGE CONTENT BEGINS -->
+
+								<div class="error-container">
+									<div class="well">
+										<h1 class="grey lighter smaller">
+											<span class="blue bigger-125">
+												<i class="ace-icon fa fa-exclamation-circle"></i>
+												401
+											</span>
+											Unauthorize Workstation
+										</h1>
+
+										<hr />
+										<h3 class="lighter smaller">
+											Your workstation code is <b>{{$workstation_name}}</b>
+										</h3>
+
+										<div class="space"></div>
+
+										<div>
+
+											<h4 class="lighter smaller">
+                        @if($workstation->allowed==0)
+                          Please contact your administrator to allow your workstation
+                        @else
+                          No workstation branch is set
+                        @endif
+                      </h4>
+										</div>
+
+										<hr />
+										<div class="space"></div>
+
+										<div class="center">
+											<a href="#" class="btn btn-primary">
+												<i class="ace-icon fa fa-check"></i>
+												Allow by administrator
+											</a>
+										</div>
+									</div>
+								</div>
+
+								<!-- PAGE CONTENT ENDS -->
+							</div><!-- /.col -->
+						</div><!-- /.row -->
+					</div><!-- /.page-content -->
+				</div>
+			</div><!-- /.main-content -->
+
+      <!--[if !IE]> -->
+		<script src="{{asset('ace-master')}}/js/jquery-2.1.4.min.js"></script>
+
 		
-	</script> 	
-  </head>
 
-  <body class="nav-md">
-    <div class="container body">
-      <div class="main_container">
-        <!-- page content -->
-        <div class="col-md-12">
-          <div class="col-middle">
-                @if($workstation->branch_id==null && $workstation->allowed==1)
-                    <div class="text-center text-center">
-                        <h2>No branch assigned to this worksation.</h2>
-                        <h1>
-                        {{$code_generated}}
-                        </h1>
-                        
-                        <p>Please contact admin to solve this issue.
-                        </p>
-                    </div>					
-				@else
-                    <div class="text-center text-center">
-                        <h2>Sorry but this worksation is not allowed to access our system.</h2>
-                        <h1>
-                        {{$code_generated}}
-                        </h1>
-                        <p>A system generate <b>WORKSATION ID</b> has been generated.<br>Please inform our administrator to allow this computer.
-                        </p>
-                    </div>					
-				@endif
+    <!-- <![endif]-->
 
-          </div>
-        </div>
-        <!-- /page content -->
-      </div>
-    </div>
+    <!--[if IE]>
+    <script src="assets/js/jquery-1.11.3.min.js"></script>
+    <![endif]-->
+    <script type="text/javascript">
+    if('ontouchstart' in document.documentElement) document.write("<script src='{{asset('ace-master')}}/js/jquery.mobile.custom.min.js'>"+"<"+"/script>");
+    </script>
+    <script src="{{asset('ace-master')}}/js/bootstrap.min.js"></script>
 
-    <!-- jQuery -->
-    <script src="{{asset('/gentelella/workstation')}}/vendors/jquery/dist/jquery.min.js"></script>
-    <!-- Bootstrap -->
-    <script src="{{asset('/gentelella/workstation')}}/vendors/bootstrap/dist/js/bootstrap.min.js"></script>
-    <!-- FastClick -->
-    <script src="{{asset('/gentelella/workstation')}}/vendors/fastclick/lib/fastclick.js"></script>
-    <!-- NProgress -->
-    <script src="{{asset('/gentelella/workstation')}}/vendors/nprogress/nprogress.js"></script>
+    <!-- page specific plugin scripts -->
 
-    <!-- Custom Theme Scripts -->
-    <script src="{{asset('/gentelella/workstation')}}/js/custom.js"></script>
+    <!-- ace scripts -->
+    <script src="{{asset('ace-master')}}/js/ace-elements.min.js"></script>
+    <script src="{{asset('ace-master')}}/js/ace.min.js"></script>
+
+      <!-- inline scripts related to this page -->
   </body>
 </html>

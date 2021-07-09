@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Bavix\Wallet\Traits\HasWallet;
 use Bavix\Wallet\Traits\HasWallets;
 use Bavix\Wallet\Interfaces\Wallet;
+
 class Client extends Model
 {
     use HasFactory,HasWallet, HasWallets;
@@ -51,6 +52,10 @@ class Client extends Model
 
     public function loan(){
         return $this->hasMany('App\Models\DBLoans\Loan');
+    }
+
+    public function in_process_loan(){
+        return $this->loan()->where('status_id','<',6)->orderBy('date_loan','DESC');
     }
 
     public function active_loan(){

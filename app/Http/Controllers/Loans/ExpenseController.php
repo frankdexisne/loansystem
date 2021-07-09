@@ -85,7 +85,7 @@ class ExpenseController extends Controller
     }
 
     public function jsonData(Request $request){
-        $data = Expense::get();
+        $data = $request->has('expense_date') ? Expense::where('payment_mode_id',$request->payment_mode_id)->whereDate('expense_date',date('Y-m-d',strtotime($request->expense_date)))->get() : Expense::where('payment_mode_id',$request->payment_mode_id)->get();
         return ExpenseResource::collection($data);
     }
 }

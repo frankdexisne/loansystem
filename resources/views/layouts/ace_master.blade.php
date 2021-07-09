@@ -4,11 +4,13 @@
 	<head>
 		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
 		<meta charset="utf-8" />
+		<meta name="csrf-token" content="{{csrf_token()}}">
 		<title>{{env('APP_ALIAS')}}</title>
 
 		<meta name="description" content="" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
-
+		<!-- CSRF Token -->
+		<meta name="csrf-token" content="{{ csrf_token() }}">
 		<!-- bootstrap & fontawesome -->
 		<link rel="stylesheet" href="{{asset('ace-master')}}/css/bootstrap.min.css" />
 		<link rel="stylesheet" href="{{asset('ace-master')}}/font-awesome/4.5.0/css/font-awesome.min.css" />

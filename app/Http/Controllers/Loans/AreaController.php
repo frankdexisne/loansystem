@@ -6,8 +6,11 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\DBLoans\Area;
 use App\Http\Resources\Loans\AreaResource;
+use App\Http\Requests\Loans\AreaRequest;
 class AreaController extends Controller
 {
+
+    private $dir = 'loan.areas.';
     /**
      * Display a listing of the resource.
      *
@@ -15,7 +18,7 @@ class AreaController extends Controller
      */
     public function index(Request $request)
     {
-        
+        return view($this->dir.'index');
     }
 
     /**
@@ -34,9 +37,10 @@ class AreaController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(AreaRequest $request)
     {
-        //
+        $data = Area::create($request->except('_token'));
+        return response()->json(['message'=>'Saved','data'=>$data],200);
     }
 
     /**
@@ -68,9 +72,10 @@ class AreaController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(AreaRequest $request, $id)
     {
-        //
+        Area::where('id',$id)->update($request->only('name'));
+        return response()->json(['message'=>'Saved'],200);
     }
 
     /**
@@ -81,11 +86,21 @@ class AreaController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $area = Area::findOrFail($id);
+        if($area){
+            $area->delete();
+            return response()->json([
+                'message'=>'Deleted!'
+            ],200);
+        }else{
+            return response()->json([
+                'message'=>'Record not exist'
+            ],422);
+        }
     }
 
     public function jsonData(Request $request){
-        $data = Area::get();
+        $data = $request->has('reimburse_date') ? Area::where('for_daily_areas',$request->for_daily_areas)->with(['reimbursement'=>function($query) use($request){ $query->whereDate('reimburse_date',date('Y-m-d',strtotime($request->reimburse_date))); }])->get() : ($request->has('for_daily_areas') ? Area::where('for_daily_areas',$request->for_daily_areas)->orderBy('for_daily_areas','ASC')->get() : Area::get());
         return AreaResource::collection($data);
     }
 

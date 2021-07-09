@@ -9,17 +9,20 @@ use App\Models\DBPayroll\Employee;
 use App\Models\DBLoans\Area;
 use App\Models\User;
 use App\Http\Resources\Payroll\EmployeeResource;
+use Illuminate\Support\Str;
 use Validator;
 use Hash;
 class EmployeeController extends Controller
 {
+    private $dir = 'payroll.employees.';
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
+        return view($this->dir.'index');
         
     }
 
@@ -41,12 +44,16 @@ class EmployeeController extends Controller
      */
     public function store(EmployeeRequest $request)
     {
-        if($request->has('id')){
-            Employee::where('id',$request->id)->update($request->except('_token','id'));
-        }else{
-            Employee::create($request->except('_token','id'));
-        }
-        return response()->json(['message'=>'Saved']);
+        // if($request->has('id')){
+        //     Employee::where('id',$request->id)->update($request->except('_token','id'));
+        // }else{
+        //     Employee::create($request->except('_token','id'));
+        // }
+        // return response()->json(['message'=>'Saved']);
+        $request->merge(['employee_no'=>'EMP-'.Str::random(10)]);
+        $employee = Employee::create($request->except('_token'));
+        $data = Employee::where('id',$employee->id)->with(['branch','job_title','user'])->first();
+        return response()->json(['message'=>'Saved','data'=>$data],200);
     }
 
     /**
@@ -80,7 +87,8 @@ class EmployeeController extends Controller
      */
     public function update(EmployeeRequest $request, $id)
     {
-        //
+        Employee::where('id',$id)->update($request->except('_token','id'));
+        return response()->json(['message'=>'Saved'],200);
     }
 
     /**
@@ -91,7 +99,13 @@ class EmployeeController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $employee = Employee::firstOrNew(['id'=>$id]);
+        if($employee->exists){
+            Employee::where('id',$id)->delete();
+            return response()->json(['message'=>'Deleted'],200);
+        }else{
+            abort(404);
+        }
     }
 
     public function jsonData(Request $request){
@@ -108,7 +122,7 @@ class EmployeeController extends Controller
         }else{
             $user = User::create([
                 'name'=>$request->name,
-                'email'=>$request->username.'@'.env('COMPANY_PREFIX').'.com',
+                'email'=>$request->username,
                 'password'=>$request->password!=null ? Hash::make($request->password) : Hash::make('PassworD')
             ]);
             Employee::where('id',$request->id)->update(['user_id'=>$user->id]);

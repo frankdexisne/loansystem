@@ -223,18 +223,22 @@ class ClientController extends Controller
     public function destroy($id)
     {
         $client = Client::firstOrNew(['id'=>$id]);
+        
         if($client->exists){
-            Schedule::whereHas('loan',function($query) use($id){ $query->where('client_id',$id); })->delete();
-            Loan::where('client_id',$id)->delete();
-            Payment::whereHas('loan',function($query) use($id){ $query->where('client_id',$id); })->delete();
-            Payment::where('client_id',$id)->delete();
-            Withdraw::where('client_id',$id)->delete();
-            Client::where('id',$id)->delete();
-            return response()->json(['message'=>'Deleted'],200);
+            // Address::where('client_id',$id)->delete();
+            // Beneficiary::where('client_id',$id)->delete();
+            // $co_maker = CoMaker::where('client_id',$id);
+            // CoMakerAddress::where('co_maker_id',$co_maker->first()->id)->delete();
+            // $co_maker->delete();
+            // Client::where('id',$id)->delete();
+            
+            return response()->json(['message'=>'Deleting client is not available'],200);
         }else{
             abort(404);
         }
     }
+
+    
 
     public function jsonData(Request $request){
         $client = new Client;
@@ -274,10 +278,13 @@ class ClientController extends Controller
                     );
                 },
                 'active_loan'=>function($query){
-                    $query->with(['category','term','payment_mode','payment','schedule']);
+                    $query->with(['category','term','payment_mode','payment','schedule','status']);
                 },
                 'inactive_loan'=>function($query){
-                    $query->with(['category','term','payment_mode','payment','schedule']);
+                    $query->with(['category','term','payment_mode','payment','schedule','status']);
+                },
+                'in_process_loan'=>function($query){
+                    $query->with(['category','term','payment_mode','payment','schedule','status']);
                 },
                 'area',
                 'address'=>function($query){ 

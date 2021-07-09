@@ -24,7 +24,8 @@ class ChargeRequest extends FormRequest
     public function rules()
     {
         return [
-            'name'=>'required|unique:charges,name,'.$this->id
+            'name'=>'required|unique:charges,name,'.$this->id,
+            'value'=>'required|numeric'
         ];
     }
 }

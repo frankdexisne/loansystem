@@ -9,14 +9,15 @@ use App\Models\DBLoans\Branch;
 use App\Http\Resources\Loans\BranchResource;
 class BranchController extends Controller
 {
+    private $dir = 'loan.branches.';
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        
+        return view($this->dir.'index');
     }
 
     /**
@@ -37,8 +38,8 @@ class BranchController extends Controller
      */
     public function store(BranchRequest $request)
     {
-        Branch::create($request->only('name'));
-        return response()->json(['message'=>'Saved'],200);
+        $data = Branch::create($request->only('name'));
+        return response()->json(['message'=>'Saved','data'=>$data],200);
     }
 
     /**
@@ -96,5 +97,39 @@ class BranchController extends Controller
     public function jsonData(Request $request){
         $data = Branch::get();
         return BranchResource::collection($data);
+    }
+
+    public function submit_fund(Request $request){
+        $http_code=200;
+        $message='';
+        $type='';
+        $branch = getWorkStation()->branch;
+        if($request->payment_mode_id==1){
+            if($branch->hasWallet('daily_coh')==false){
+                $branch->createWallet([
+                    'name' => 'DAILY CASH ON HAND',
+                    'slug' => 'daily_coh'
+                ]);
+            }
+            $wallet_coh = $branch->getWallet('daily_coh');
+            $deposit_coh=$wallet_coh->deposit($request->fund);
+            $message="Successfully deposited";
+            $type="success";
+        }else{
+            if($branch->hasWallet('weekly_coh')==false){
+                $branch->createWallet([
+                    'name' => 'WEEKLY CASH ON HAND',
+                    'slug' => 'weekly_coh'
+                ]);
+            }
+            $wallet_coh = $branch->getWallet('weekly_coh');
+            $deposit_coh=$wallet_coh->deposit($request->fund);
+            $message="Successfully deposited";
+            $type="success";
+        }
+        return response()->json([
+            'message'=>$message,
+            'type'=>$type
+        ],$http_code);
     }
 }

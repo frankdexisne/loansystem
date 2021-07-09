@@ -9,14 +9,15 @@ use App\Models\DBLoans\Term;
 use App\Http\Resources\Loans\TermResource;
 class TermController extends Controller
 {
+    private $dir = 'loan.terms.';
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        
+        return view($this->dir.'index');
     }
 
     /**
@@ -37,8 +38,8 @@ class TermController extends Controller
      */
     public function store(TermRequest $request)
     {
-        Term::create($request->only('no_of_months'));
-        return response()->json(['message'=>'Saved'],200);
+        $data = Term::create($request->only('no_of_months','is_daily'));
+        return response()->json(['message'=>'Saved','data'=>$data],200);
     }
 
     /**

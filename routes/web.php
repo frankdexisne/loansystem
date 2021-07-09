@@ -17,6 +17,7 @@ Route::get('/', function () {
     return view('welcome');
 });
 Route::resource('branches',App\Http\Controllers\Loans\BranchController::class);
+Route::post('branches/submit-fund',[App\Http\Controllers\Loans\BranchController::class,'submit_fund'])->name('branches.submit_fund');
 Route::resource('relationships',App\Http\Controllers\Loans\RelationshipController::class);
 Route::resource('statuses',App\Http\Controllers\Loans\StatusController::class);
 Route::resource('categories',App\Http\Controllers\Loans\CategoryController::class);
@@ -36,11 +37,20 @@ Route::resource('employees',App\Http\Controllers\Payroll\EmployeeController::cla
 Route::resource('job-titles',App\Http\Controllers\Payroll\JobTitleController::class);
 
 Route::resource('users',App\Http\Controllers\System\UserController::class);
+Route::post('/users/reset-password/{id}',[App\Http\Controllers\System\UserController::class,'resetPassword'])->name('users.resetPassword');
+
+Route::get('/loans/view-for-approval',[App\Http\Controllers\Loans\LoanController::class,'view_for_approval'])->name('loans.view-for-approval');
+Route::get('/loans/view-approved',[App\Http\Controllers\Loans\LoanController::class,'view_approved'])->name('loans.view-approved');
+Route::get('/loans/view-for-release',[App\Http\Controllers\Loans\LoanController::class,'view_for_release'])->name('loans.view-for-release');
+Route::get('/loans/view-released',[App\Http\Controllers\Loans\LoanController::class,'view_releases'])->name('loans.view-released');
 
 Route::resource('loans',App\Http\Controllers\Loans\LoanController::class);
 Route::post('loans/approval',[App\Http\Controllers\Loans\LoanController::class,'approval'])->name('loans.approval');
 Route::post('loans/for-release',[App\Http\Controllers\Loans\LoanController::class,'for_release'])->name('loans.for-release');
 Route::post('loans/release',[App\Http\Controllers\Loans\LoanController::class,'release'])->name('loans.release');
+
+
+
 Route::get('loans/voucher/{id}',[App\Http\Controllers\Loans\LoanController::class,'voucher'])->name('loans.voucher');
 Route::get('loans/soa/{id}',[App\Http\Controllers\Loans\LoanController::class,'soa'])->name('loans.soa');
 
@@ -97,6 +107,7 @@ Route::get('job-titles-json',[App\Http\Controllers\Payroll\JobTitleController::c
 Route::get('users-json',[App\Http\Controllers\System\UserController::class,'jsonData'])->name('users.jsonData');
 
 Route::get('loans-json',[App\Http\Controllers\Loans\LoanController::class,'jsonData'])->name('loans.jsonData');
+Route::post('loans-releases-json',[App\Http\Controllers\Loans\LoanController::class,'jsonDataGetReleases'])->name('loans.jsonDataGetReleases');
 Route::get('loans-active-json',[App\Http\Controllers\Loans\LoanController::class,'jsonActiveLoans'])->name('loans.jsonActiveLoans');
 Route::get('payments-json',[App\Http\Controllers\Loans\PaymentController::class,'jsonData'])->name('payments.jsonData');
 Route::get('deposits-json',[App\Http\Controllers\Loans\DepositController::class,'jsonData'])->name('deposits.jsonData');

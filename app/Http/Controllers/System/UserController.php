@@ -9,15 +9,19 @@ use App\Models\Role;
 use App\Models\ModelHasRole;
 use App\Models\DBPayroll\Employee;
 use App\Http\Resources\System\UserResource;
+use App\Http\Requests\System\UserRequest;
+use Hash;
 class UserController extends Controller
 {
+    private $dir = 'system.users.';
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
+        return view($this->dir.'index');
         
     }
 
@@ -73,7 +77,8 @@ class UserController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        User::where('id',$id)->update($request->only('name','email'));
+        return response()->json(['message'=>'Saved'],200);
     }
 
     /**
@@ -113,5 +118,11 @@ class UserController extends Controller
         }
         return response()->json(['message'=>'Success']);
         
+    }
+
+    public function resetPassword(Request $request,$id){
+        User::where('id',$id)->update([
+            'password'=>Hash::make('PassworD')
+        ]);
     }
 }

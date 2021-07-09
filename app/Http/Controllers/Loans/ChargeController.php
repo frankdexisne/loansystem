@@ -10,14 +10,15 @@ use App\Models\DBLoans\Loan;
 use App\Http\Resources\Loans\ChargeResource;
 class ChargeController extends Controller
 {
+    private $dir = 'loan.charges.';
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        
+        return view($this->dir.'index');
     }
 
     /**
@@ -38,8 +39,8 @@ class ChargeController extends Controller
      */
     public function store(ChargeRequest $request)
     {
-        Charge::create($request->except('_token'));
-        return response()->json(['message'=>'Saved'],200);
+        $data=Charge::create($request->except('_token'));
+        return response()->json(['message'=>'Saved','data'=>$data],200);
     }
 
     /**
@@ -106,13 +107,14 @@ class ChargeController extends Controller
      */
     public function destroy($id)
     {
-        $charge = Charge::firstOrNew(['id'=>$id]);
-        if($charge->exists){
-            Charge::where('id',$id)->delete();
-            return response()->json(['message'=>'Deleted'],200);
-        }else{
-            abort(404);
-        }
+        // $charge = Charge::firstOrNew(['id'=>$id]);
+        // if($charge->exists){
+        //     Charge::where('id',$id)->delete();
+        //     return response()->json(['message'=>'Deleted'],200);
+        // }else{
+        //     abort(404);
+        // }
+        echo $id;
     }
 
     public function jsonData(Request $request){

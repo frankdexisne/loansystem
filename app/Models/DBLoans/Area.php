@@ -11,4 +11,8 @@ class Area extends Model
     protected $connection = 'mysql';
     
     protected $fillable = ['branch_id','name'];
+
+    public function reimbursement(){
+        return $this->hasMany('App\Models\DBLoans\Reimbursement');
+    }
 }

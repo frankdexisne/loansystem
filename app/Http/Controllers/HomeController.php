@@ -5,6 +5,10 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Auth;
 use App\Models\User;
+use App\Models\DBLoans\Branch;
+use Cookie;
+use App\Models\Workstation;
+use App\Models\DBLoans\Loan;
 class HomeController extends Controller
 {
     /**
@@ -24,7 +28,25 @@ class HomeController extends Controller
      */
     public function index()
     {
-        return view('home');
+        $branch = getWorkStation()->branch;
+        
+        if($branch->hasWallet('daily_coh')==false){
+            $branch->createWallet([
+                'name' => 'DAILY CASH ON HAND',
+                'slug' => 'daily_coh'
+            ]);
+        }
+        if($branch->hasWallet('weekly_coh')==false){
+            $branch->createWallet([
+                'name' => 'WEEKLY CASH ON HAND',
+                'slug' => 'weekly_coh'
+            ]);
+        }
+        $coh_daily = $branch->getWallet('daily_coh') ? $branch->getWallet('daily_coh')->balance : 0;
+        $coh_weekly = $branch->getWallet('weekly_coh') ? $branch->getWallet('weekly_coh')->balance : 0;
+        
+        return view('home',compact('coh_daily','coh_weekly'));
+        // dd(Loan::where('id',7)->with('loan_charge')->first());
     }
 
     public function profile()

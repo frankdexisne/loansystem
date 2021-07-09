@@ -9,14 +9,15 @@ use App\Models\DBLoans\PaymentMode;
 use App\Http\Resources\Loans\PaymentModeResource;
 class PaymentModeController extends Controller
 {
+    private $dir = 'loan.payment_modes.';
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        
+        return view($this->dir.'index');
     }
 
     /**
@@ -37,8 +38,8 @@ class PaymentModeController extends Controller
      */
     public function store(PaymentModeRequest $request)
     {
-        PaymentMode::create($request->except('_token'));
-        return response()->json(['message'=>'Saved'],200);
+        $data= PaymentMode::create($request->except('_token'));
+        return response()->json(['message'=>'Saved','data'=>$data],200);
     }
 
     /**
@@ -73,8 +74,9 @@ class PaymentModeController extends Controller
     public function update(PaymentModeRequest $request, $id)
     {
         
-        PaymentMode::where('id')->update($request->except('_token','id'));
+        PaymentMode::where('id',$id)->update($request->except('_token','id'));
         return response()->json(['message'=>'Saved'],200);
+        
     }
 
     /**

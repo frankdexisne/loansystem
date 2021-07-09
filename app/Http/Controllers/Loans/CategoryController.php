@@ -9,14 +9,15 @@ use App\Models\DBLoans\Category;
 use App\Http\Resources\Loans\CategoryResource;
 class CategoryController extends Controller
 {
+    private $dir = 'loan.categories.';
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        
+        return view($this->dir.'index');
     }
 
     /**
@@ -37,8 +38,8 @@ class CategoryController extends Controller
      */
     public function store(CategoryRequest $request)
     {
-        Category::create($request->only('name'));
-        return response()->json(['message'=>'Saved'],200);
+        $data= Category::create($request->only('name'));
+        return response()->json(['message'=>'Saved','data'=>$data],200);
     }
 
     /**

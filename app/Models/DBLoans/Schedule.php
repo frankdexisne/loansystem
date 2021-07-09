@@ -16,4 +16,8 @@ class Schedule extends Model
     public function getScheduleDateFormattedAttribute(){
         return date('m/d/Y',strtotime($this->schedule_date));
     }
+
+    public function loan(){
+        return $this->belongsTo('App\Models\DBLoans\Loan');
+    }
 }

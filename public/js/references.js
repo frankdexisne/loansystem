@@ -27,3 +27,21 @@ function populate_dropdown_subTable(ajaxUrl,$element,columnValue,columnText){
         }
     })
 }
+
+function generateTable($element,ajaxUrl,ajaxType,ajaxData,_columns,groupKey){
+    if($.fn.DataTable.isDataTable( $element )){
+        $($element).DataTable().destroy();
+    }
+
+    $($element).DataTable({
+        ajax: {
+            url : ajaxUrl,
+            type : ajaxType,
+            data: ajaxData
+        },
+        columns: _columns,
+        select: {
+            style: 'multi'
+        }
+    })
+}

@@ -13,8 +13,10 @@ use App\Models\DBLoans\LoanCharge;
 use App\Http\Resources\Loans\LoanResource;
 use App\Http\Requests\Loans\UpdateLoanRequest;
 use PDF;
+use DB;
 class LoanController extends Controller
-{
+{   
+    private $dir = 'loan.loans.';
     /**
      * Display a listing of the resource.
      *
@@ -32,7 +34,7 @@ class LoanController extends Controller
      */
     public function create()
     {
-        
+        return view($this->dir.'create');
     }
 
     /**
@@ -136,6 +138,8 @@ class LoanController extends Controller
         if($loan->first()){
             $loan_with_payment = $loan->with('payment')->first();
             if($loan_with_payment->payment->count()==0){
+                LoanCharge::where('loan_id',$id)->delete();
+                Schedule::where('loan_id',$id)->delete();
                 $loan->delete();
                 return response()->json(['message'=>'Deleted'],200);    
             }else{
@@ -148,6 +152,19 @@ class LoanController extends Controller
     }
 
     public function approval(Request $request){
+        $name = $request->action == 'APPROVED' ? 'APPROVED' : 'DENIED';
+        $status = Status::firstOrNew(['name'=>$name]);
+        if($status->exists){
+            Loan::whereIn('id',$request->loan_ids)
+                 ->whereHas('status',function($query){
+                     $query->where('name','FOR APPROVAL');
+                 })
+                 ->update(['status_id'=>$status->id]);
+                 return response()->json(['message'=>'success'],200);
+        }
+    }
+
+    public function approval_old(Request $request){
         $name = $request->action == 'approve' ? 'APPROVED' : 'DENIED';
         $status = Status::firstOrNew(['name'=>$name]);
         if($status->exists){
@@ -166,9 +183,21 @@ class LoanController extends Controller
         }
     }
 
-    
     public function for_release(Request $request){
-        
+        $request->merge([
+            'status_id'=>5
+        ]);
+        Loan::where('id',$request->loan_id)->update($request->only('to_release_at','first_payment','status_id'));
+        foreach($request->charges as $charge){
+            LoanCharge::create($charge);
+        }
+        if($request->has('byouts')){
+            Loan::whereIn('id',$request->byouts)->update(['byout_of'=>$request->loan_id]);
+        }
+        return response()->json(['message'=>'Successfully add to for release'],200);
+    }
+
+    public function for_release1(Request $request){
         $name = 'FOR RELEASE';
         $status = Status::firstOrNew(['name'=>$name]);
         if($status->exists){
@@ -177,29 +206,29 @@ class LoanController extends Controller
                 
                 if($loan->status_id==3){
                         
-                    $request_chrg_ids=$request->charges;
-                    $total_prev_balance = 0;
+                    // $request_chrg_ids=$request->charges;
+                    // $total_prev_balance = 0;
                     if($request->has('byouts')){
                         Loan::whereIn('id',$request->byouts)->update(['byout_of'=>$request->id]);
-                        $total_prev_balance = Loan::whereIn('id',$request->byouts)->sum('balance');
-                        if($total_prev_balance>0){
-                            LoanCharge::create(['loan_id'=>$request->id,'charge_id'=>9,'amount'=>$total_prev_balance]);
-                        }
+                        // $total_prev_balance = Loan::whereIn('id',$request->byouts)->sum('balance');
+                        // if($total_prev_balance>0){
+                        //     LoanCharge::create(['loan_id'=>$request->id,'charge_id'=>9,'amount'=>$total_prev_balance]);
+                        // }
                     }
-                    if($request_chrg_ids!=null){
-                        foreach($request_chrg_ids as $chrg_id){
+                    // if($request_chrg_ids!=null){
+                    //     foreach($request_chrg_ids as $chrg_id){
                             
-                            $chrg=Charge::where('id',$chrg_id)->first();
-                            if($chrg->id==1){
-                                $amount = $loan->loan_amount * ($loan->interest/100);
-                                LoanCharge::create(['loan_id'=>$request->id,'charge_id'=>$chrg_id,'amount'=>$amount]);
-                            }else{
-                                $amount = $chrg->is_percent==1 ? $loan->loan_amount * ($chrg->value/100) : $chrg->value;
-                                LoanCharge::create(['loan_id'=>$request->id,'charge_id'=>$chrg_id,'amount'=>$amount]);
-                            }
+                    //         $chrg=Charge::where('id',$chrg_id)->first();
+                    //         if($chrg->id==1){
+                    //             $amount = $loan->loan_amount * ($loan->interest/100);
+                    //             LoanCharge::create(['loan_id'=>$request->id,'charge_id'=>$chrg_id,'amount'=>$amount]);
+                    //         }else{
+                    //             $amount = $chrg->is_percent==1 ? $loan->loan_amount * ($chrg->value/100) : $chrg->value;
+                    //             LoanCharge::create(['loan_id'=>$request->id,'charge_id'=>$chrg_id,'amount'=>$amount]);
+                    //         }
                             
-                        }
-                    }
+                    //     }
+                    // }
                     
                     Loan::where('id',$request->id)->update([
                         'status_id'=>$status->id
@@ -285,9 +314,47 @@ class LoanController extends Controller
         }
     }
 
+    public function view_for_approval(){
+        return view($this->dir.'for_approval');
+    }
+
+    public function view_approved(){
+        $charges = Charge::where('is_visible',1)->get();
+        return view($this->dir.'approved',compact('charges'));
+    }
+
+    public function view_for_release(){
+        $charges = Charge::where('is_visible',1)->get();
+        return view($this->dir.'for_release',compact('charges'));
+    }
+
+    public function view_released(){
+        return view($this->dir.'released');
+    }
 
 
     public function jsonData(Request $request){
+
+        $data = Loan::whereHas('status',function($query) use($request){
+                    $query->where('name',$request->status);
+                })
+                ->with([
+                    'client'=>function($query){
+                        $query->with(['active_loan'=>function($query){
+                            $query->with(['category','term','payment_mode']);
+                        }]);
+                    },
+                    'schedule',
+                    'category',
+                    'payment_mode',
+                    'term'
+                ])
+                ->get();
+            
+        return LoanResource::collection($data);
+    }
+
+    public function jsonData1(Request $request){
         $client = new Client;
         if($request->has('loading_type')){
             if($request->search_text==''){
@@ -382,6 +449,17 @@ class LoanController extends Controller
                 ])
                 ->get();
         
+        return LoanResource::collection($data);
+    }
+
+    public function jsonDataGetReleases(Request $request){
+        $data = Loan::whereDate('date_release',date('Y-m-d',strtotime($request->date_release)))
+                    // ->where('payment_mode_id',$request->payment_mode_id)
+                    // ->join('clients','clients.id','=','loans.client_id')
+                    // ->join('areas','areas.id','=','clients.area_id')
+                    ->with(['client'=>function($query){ $query->with('area'); },'loan_charge'])
+                    ->get();
+                    // ->get([DB::raw("CONCAT(clients.lname,', ',clients.fname,' ',clients.mname) AS full_name"),'balance','loan_amount','areas.name']);
         return LoanResource::collection($data);
     }
 

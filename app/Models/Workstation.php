@@ -14,4 +14,8 @@ class Workstation extends Model
     protected $fillable = [
         'workstation_name','workstation_description','encrypted_ws','branch_id','allowed'
     ];
+
+    public function branch(){
+        return $this->belongsTo('App\Models\DBLoans\Branch');
+    }
 }
