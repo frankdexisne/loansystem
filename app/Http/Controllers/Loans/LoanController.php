@@ -312,7 +312,7 @@ class LoanController extends Controller
 
                     Loan::where('id',$request->id)->update([
                         'status_id'=>$status->id,
-                        'date_release'=>date('Y-m-d',strtotime($request->date_release)),
+                        'date_release'=>date('Y-m-d',strtotime($request->release_date)),
                         'first_payment'=>date('Y-m-d',strtotime($request->first_payment)),
                         'maturity_date'=>$request->maturity_date,
                         'payment_per_sched'=>$amount_due,

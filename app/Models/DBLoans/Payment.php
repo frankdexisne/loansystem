@@ -11,7 +11,7 @@ class Payment extends Model
 
     protected $connection = 'mysql';
 
-    protected $fillable = ['client_id','loan_id','orno','payment_date','amount','ps_id','cbu_id','ins_id'];
+    protected $fillable = ['client_id','loan_id','reimbursement_id','orno','payment_date','amount','ps_id','cbu_id','ins_id'];
 
     protected $appends = ['payment_date_formatted','amount_formatted','ps_amount','cbu_amount','ins_amount'];
 

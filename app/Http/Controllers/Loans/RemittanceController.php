@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\DBLoans\Area;
 use App\Models\DBLoans\DailyTransactionReport;
 use App\Models\DBLoans\Payment;
+use App\Models\DBLoans\Reimbursement;
 class RemittanceController extends Controller
 {
     private $dir = 'loan.remittances.';
@@ -39,7 +40,13 @@ class RemittanceController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->merge(['reimburse_date'=>date('Y-m-d')]);
+        
+        $reimbursement = Reimbursement::create($request->only('reimburse_date','area_id'));
+        Payment::whereIn('id',$request->payment_ids)->update(['reimbursement_id'=>$reimbursement->id]);
+        return response()->json([
+            'message'=>'Success!'
+        ]);
     }
 
     /**
@@ -88,7 +95,7 @@ class RemittanceController extends Controller
     }
 
     public function jsonPayment(Request $request){
-        $data = Payment::where('payment_date',date('Y-m-d',strtotime($request->payment_date)))->whereHas('loan',function($query)  use($request){ $query->whereHas('client',function($query) use($request){ $query->where('area_id',$request->area_id); }); })->with(['ps','cbu','loan'=>function($query){ $query->with('client'); }])->get()->toArray();
+        $data = Payment::whereNull('reimbursement_id')->where('payment_date',date('Y-m-d',strtotime($request->payment_date)))->whereHas('loan',function($query)  use($request){ $query->whereHas('client',function($query) use($request){ $query->where('area_id',$request->area_id); }); })->with(['ps','cbu','loan'=>function($query){ $query->with('client'); }])->get()->toArray();
         return response()->json(['data'=>$data]);
     }
 }

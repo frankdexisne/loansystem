@@ -137,6 +137,8 @@ class PaymentController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
+    
+
     public function update(PaymentRequest $request, $id)
     {
         $ps_id = null; $cbu_id = null;

@@ -108,7 +108,7 @@
                 </thead>
 
                 <tfoot>
-                    <th></th>
+                    <th><button type="button" id="button-remittance" class="btn btn-primary btn-sm">REMIT THIS COLLECTION</button></th>
                     <th></th>
                     <th></th>
                     <th></th>
@@ -151,7 +151,7 @@
         });
 
         $temp = null;
-        $colIndex = 2;
+        $colIndex = 6;
         $disable_form_search = 1;
 
         var formatter = new Intl.NumberFormat('en-US', {
@@ -236,11 +236,13 @@
                     $total_ps =0;
                     $total_cbu =0;
                     $total_penalty=0;
+                    $total_collection =0;
                     $.each(json.data,function(){
-                        $total_amount +=this.amount;
-                        $total_ps =this.ps.amount;
-                        $total_cbu =this.cbu.amount;
-                        $total_penalty=this.penalty;
+                        $total_amount +=parseFloat(this.amount);
+                        $total_ps +=parseFloat(this.ps.amount);
+                        $total_cbu +=parseFloat(this.cbu.amount);
+                        $total_penalty+=parseFloat(this.penalty);
+                        $total_collection += (parseFloat(this.amount)+parseFloat(this.ps.amount)+parseFloat(this.cbu.amount)+parseFloat(this.penalty));
                     });
 
                     $th = $($element).find('tfoot').find('tr').eq(0).find('th');
@@ -248,9 +250,60 @@
                     $th.eq(3).html(formatter.format($total_ps).replace('PHP','&#8369;'));
                     $th.eq(4).html(formatter.format($total_cbu).replace('PHP','&#8369;'));
                     $th.eq(5).html(formatter.format($total_penalty).replace('PHP','&#8369;'));
+                    $th.eq(6).html(formatter.format($total_collection).replace('PHP','&#8369;'));
                     $('#reload-active-clients').click();
                     
                     
+                }
+            })
+
+            $('#button-remittance').off('click');
+
+            $('#button-remittance').on('click',function(e){
+                e.preventDefault();
+                if(dataTable.data().count()>0){
+                    Swal.fire({
+                        title: 'Are you sure?',
+                        text: "Continue remit this payment(s)",
+                        icon: 'question',
+                        showCancelButton: true,
+                        confirmButtonColor: '#30d649fc',
+                        cancelButtonColor: '#d33',
+                        confirmButtonText: 'Yes, remit all payments!'
+                    }).then((result) => {    
+                        if (result.isConfirmed) {
+                            var payment_ids = [];
+                            $.each(dataTable.data().toArray(),function(){
+                                payment_ids.push(this.id);
+                            });
+
+                            $.ajax({
+                                url : "{{route('remittances.store')}}",
+                                type : "POST",
+                                data: {
+                                    _token : $('meta[name="csrf-token"]').attr('content'),
+                                    payment_ids : payment_ids,
+                                    area_id : $('form').find('select').val()
+                                },
+                                success: function(res){
+                                    Swal.fire(
+                                        'Success!',
+                                        'Payments is already remitted!',
+                                        'success'
+                                    ).then((result)=>{
+                                        dataTable.ajax.reload();               
+                                    });
+                                }
+                            })
+                            
+                        }
+                    })
+                }else{
+                    Swal.fire(
+                        'Ooops!',
+                        'No payment(s) to remit!',
+                        'error'
+                    )
                 }
             })
 
@@ -271,7 +324,13 @@
                         penalty : $tr.find('input[name="penalty"]').val()
                     },
                     success: function(res){
-                        console.log(res);
+                        Swal.fire(
+                            'Success!',
+                            'Payment has been posted!',
+                            'success'
+                        ).then((result)=>{
+                            dataTable.ajax.reload();               
+                        });
                     },
                     error: function(xhr){
 
@@ -315,13 +374,20 @@
                 $('form#form').submit();
             });
 
+            dataTable.off('click','a.edit');
+
             dataTable.on('click','a.edit',function(e){
                 $tr=$(this).closest('tr');
+                
                 $temp = dataTable.row($tr).data();
                 $td = $tr.find('td');
+                
                 // CHANGE COLUMN TO INPUT
-                $td.eq(0).html('<input type="text" class="form-input" style="width:100%" value="'+$temp['no_of_months']+'"><span class="hidden red error-no_of_months"></div>');
-                $td.eq(1).html('<input type="checkbox" class="form-input" "'+($temp['daily_only']==1 ? 'checked="checked"' : '')+'"></div>');
+                $td.eq(1).html('<input type="text" class="form-input" style="width:100%" value="'+$temp['orno']+'"><span class="hidden red error-orno"></div>');
+                $td.eq(2).html('<input type="number" class="form-input" style="width:100%" value="'+$temp['amount']+'"><span class="hidden red error-amount"></div>');
+                $td.eq(3).html('<input type="number" class="form-input" style="width:100%" value="'+($temp['ps']!=null ? $temp['ps']['amount'] : 0)+'"><span class="hidden red error-ps"></div>');
+                $td.eq(4).html('<input type="number" class="form-input" style="width:100%" value="'+($temp['cbu']!=null ? $temp['cbu']['amount'] : 0)+'"><span class="hidden red error-cbu"></div>');
+                $td.eq(5).html('<input type="number" class="form-input" style="width:100%" value="'+$temp['penalty']+'"><span class="hidden red error-penalty"></div>');
 
                 $td.eq($colIndex).find('a.edit').removeClass('edit').addClass('save');
                 $td.eq($colIndex).find('a').eq(0).find('i').removeClass('fa-pencil').addClass('fa-check');
@@ -332,25 +398,36 @@
                 $tr.removeClass('selected');
             });
 
+            dataTable.off('click','a.save');
+
             dataTable.on('click','a.save',function(e){
                 $tr=$(this).closest('tr');
                 $temp = dataTable.row($tr).data();
                 $td = $tr.find('td');
-                
-
-                
+                                
                 var form_data = {
                     id : $temp['id'],
                     _token : $('meta[name="csrf-token"]').attr('content'),
-                    no_of_months : $td.eq(0).find('.form-input').val()
+                    loan_client_id : $temp['loan']['client_id'],
+                    payment_date: $temp['payment_date'],
+                    orno : $td.eq(1).find('.form-input').val(),
+                    amount : $td.eq(2).find('.form-input').val(),
+                    ps : $td.eq(3).find('.form-input').val(),
+                    cbu : $td.eq(4).find('.form-input').val(),
+                    penalty : $td.eq(5).find('.form-input').val(),
                 };
                 $.ajax({
-                    url: "{{url('terms')}}/"+$temp['id'],
+                    url: "{{url('payments')}}/"+$temp['id'],
                     type: "PUT",
                     data: form_data,
                     success: function(result){
                         // ASSIGN NEW VALUES
-                        $temp['name']=$td.eq(0).find('.form-input').val();
+                        $temp['orno']=$td.eq(1).find('.form-input').val();
+                        $temp['amount']= $td.eq(2).find('.form-input').val();
+                        $temp['ps']['amount']=$td.eq(3).find('.form-input').val();
+                        $temp['cbu']['amount']=$td.eq(4).find('.form-input').val();
+                        $temp['penalty']=$td.eq(5).find('.form-input').val();
+
                         $td.eq($colIndex).find('a.edit').removeClass('edit').addClass('save');
                         $td.eq($colIndex).find('a').eq(0).find('i').removeClass('fa-pencil').addClass('fa-check');
                         $td.eq($colIndex).find('a.delete').removeClass('delete').addClass('cancel');
@@ -361,7 +438,8 @@
                             'Record has been saved!',
                             'success'
                         ).then((result)=>{
-                            dataTable.row($tr).data($temp).invalidate();
+                            // dataTable.row($tr).data($temp).invalidate();
+                            dataTable.ajax.reload();
                         });
                     },
                     error: function(xhr){
@@ -411,7 +489,7 @@
                         var form_data = { _token : "{{csrf_token()}}", _method: "_delete" , id: data['id']};
 
                         $.ajax({
-                            url: "{{url('/terms')}}/"+data['id'],
+                            url: "{{url('/payments')}}/"+data['id'],
                             type: "DELETE",
                             data: form_data,
                             success: function(result){
@@ -420,8 +498,9 @@
                                     'Your file has been deleted.',
                                     'success'
                                 ).then((result)=>{
-                                    dataTable.row($tr).remove().draw(false);
-                                    $tr.removeClass('selected');
+                                    // dataTable.row($tr).remove().draw(false);
+                                    dataTable.ajax.reload();
+                                    // $tr.removeClass('selected');
                                 })
                             },
                             error: function(xhr){

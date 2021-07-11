@@ -11,5 +11,5 @@ class Reimbursement extends Model
     
     protected $connection = 'mysql';
 
-    protected $fillable = ['name','add_days'];
+    protected $fillable = ['daily_transaction_report_id','area_id','reimburse_date','created_at','updated_at'];
 }

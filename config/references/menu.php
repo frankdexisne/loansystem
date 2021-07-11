@@ -68,9 +68,9 @@ return [
         'permissions_name'=>'clients.index|loans.index',
     ],
     [
-        'name'=>'Remittance',
+        'name'=>'Payments & Remits',
         'route_name'=>'remittances.index',
-        'icon'=>'menu-icon fa fa-list-alt',
+        'icon'=>'menu-icon fa fa-money',
         'sub_menu'=>[],
         'permissions_name'=>'remittances.index',
     ],
@@ -125,13 +125,13 @@ return [
         'permissions_name'=>'reports.index',
     ],
 
-    [
-        'name'=>'References',
-        'route_name'=>'references.index',
-        'icon'=>'menu-icon fa fa-list-alt',
-        'sub_menu'=>[],
-        'permissions_name'=>'branches.index|areas.index|categories.index|terms.index|payment-modes.index|charges.index',
-    ],
+    // [
+    //     'name'=>'References',
+    //     'route_name'=>'references.index',
+    //     'icon'=>'menu-icon fa fa-list-alt',
+    //     'sub_menu'=>[],
+    //     'permissions_name'=>'branches.index|areas.index|categories.index|terms.index|payment-modes.index|charges.index',
+    // ],
 
     [
         'name'=>'System Libraries',
