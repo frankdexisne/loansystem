@@ -54,6 +54,9 @@ Route::post('loans/release',[App\Http\Controllers\Loans\LoanController::class,'r
 Route::get('loans/voucher/{id}',[App\Http\Controllers\Loans\LoanController::class,'voucher'])->name('loans.voucher');
 Route::get('loans/soa/{id}',[App\Http\Controllers\Loans\LoanController::class,'soa'])->name('loans.soa');
 
+Route::get('/remittances/json-payments',[App\Http\Controllers\Loans\RemittanceController::class,'jsonPayment'])->name('remittances.jsonPayment');
+Route::resource('remittances',App\Http\Controllers\Loans\RemittanceController::class);
+
 Route::resource('payments',App\Http\Controllers\Loans\PaymentController::class);
 Route::resource('deposits',App\Http\Controllers\Loans\DepositController::class);
 Route::resource('withdraws',App\Http\Controllers\Loans\WithdrawController::class);

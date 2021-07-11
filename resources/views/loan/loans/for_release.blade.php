@@ -107,7 +107,7 @@
                             '<a class="blue release" href="#" title="Release">'+
 								'<i class="ace-icon fa fa-send bigger-130"></i>'+
 							'</a>'+
-                            '<a class="grey print" href="#" title="Print Voucher">'+
+                            '<a class="grey print" href="'+"{{url('/loans/voucher')}}/"+data.id+'" title="Print Voucher">'+
 								'<i class="ace-icon fa fa-print bigger-130"></i>'+
 							'</a>'+
                             '<a class="green edit" href="#" title="Edit">'+

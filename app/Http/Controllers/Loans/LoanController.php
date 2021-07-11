@@ -360,6 +360,11 @@ class LoanController extends Controller
         $data = Loan::whereHas('status',function($query) use($request){
                     $query->where('name',$request->status);
                 })
+                ->whereHas('client',function($query) use($request){
+                    if($request->has('area_id')){
+                        $query->where('area_id',$request->area_id);
+                    }
+                })
                 ->with([
                     'client'=>function($query){
                         $query->with(['active_loan'=>function($query){

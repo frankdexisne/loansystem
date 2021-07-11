@@ -68,6 +68,13 @@ return [
         'permissions_name'=>'clients.index|loans.index',
     ],
     [
+        'name'=>'Remittance',
+        'route_name'=>'remittances.index',
+        'icon'=>'menu-icon fa fa-list-alt',
+        'sub_menu'=>[],
+        'permissions_name'=>'remittances.index',
+    ],
+    [
         'name'=>'Reports',
         'url'=>'#',
         'icon'=>'menu-icon fa  fa-bar-chart-o',
