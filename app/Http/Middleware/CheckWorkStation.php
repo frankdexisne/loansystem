@@ -10,11 +10,10 @@ use Illuminate\Http\Response;
 use App\Traits\AuthenticationCode;
 use Crypt;
 use App\Models\Workstation;
-
+use Illuminate\Support\Str;
 
 class CheckWorkStation
 {
-    use AuthenticationCode;
 
     /**
      * Handle an incoming request.
@@ -25,7 +24,8 @@ class CheckWorkStation
      */
     public function handle(Request $request, Closure $next)
     {
-        $encrypted_ws = !Cookie::get('workstation') ? Crypt::encrypt($this->codeGenerate()) : Cookie::get('workstation');
+        $generated_code = Str::random(4).'-'.Str::random(4).'-'.Str::random(4).'-'.Str::random(4);
+        $encrypted_ws = !Cookie::get('workstation') ? Crypt::encrypt(strtoupper($generated_code)) : Cookie::get('workstation');
         $workstation_name = Crypt::decrypt($encrypted_ws);
         $workstation=Workstation::firstOrNew(['encrypted_ws'=>$encrypted_ws]);
         if($workstation->exists){

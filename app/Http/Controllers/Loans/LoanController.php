@@ -247,6 +247,7 @@ class LoanController extends Controller
     }
 
     
+    
 
     public function release(Request $request){
         
@@ -261,15 +262,12 @@ class LoanController extends Controller
                     $loan_amount = $loan->loan_amount;
                     $interest = $loan->interest/100;
                     if($loan->payment_mode_id==1){
-                        $maturity_date = date('Y-m-d',strtotime($request->date_release.'+100 days'));
+                        $maturity_date = date('Y-m-d',strtotime($request->first_payment.'+99 days'));
                         $amount_due = ($loan_amount+($loan_amount*$interest))/100;
                     }else{
                         $add_days = $loan->payment_mode->add_days;
                         $term = $loan->term->no_of_months;
                         $divisor = in_array($add_days,[15,30]) ? ($term*30)/$add_days : ($term*4);
-
-                        
-                        
                         $amount_due = ($loan_amount+($loan_amount*$interest))/$divisor;
                         
                         $date=date('Y-m-d',strtotime($request->first_payment));
@@ -288,18 +286,41 @@ class LoanController extends Controller
                         Schedule::insert($schedules);
                     }
                     
+                    if($request->has('charges')){
+                        LoanCharge::where('loan_id',$request->id)->delete();
+                        foreach($request->charges as $charge){
+                            LoanCharge::create([
+                                'loan_id'=>$request->id,
+                                'charge_id'=>$charge['charge_id'],
+                                'amount'=>$charge['amount']
+                            ]);
+                        }
+                    }
+                    $total_deduction = LoanCharge::where('loan_id',$request->id)->sum('amount');
+
                     $request->merge([
-                        'first_payment'=>$loan->payment_mode_id==1 ? date('Y-m-d',strtotime($request->date_release.'+1 days')) : $request->first_payment,
+                        'first_payment'=>$request->first_payment,
                         'maturity_date'=>$maturity_date
                     ]);
+
+                    
+                    $branch = getWorkStation()->branch;
+
+                    $wallet = $loan->payment_mode_id==1 ? $branch->getWallet('daily_coh') : $branch->getWallet('weekly_coh');
+                    $transaction= $wallet->withdraw($loan->loan_amount-$total_deduction);
+                    $wallet->refreshBalance();
+
                     Loan::where('id',$request->id)->update([
                         'status_id'=>$status->id,
                         'date_release'=>date('Y-m-d',strtotime($request->date_release)),
                         'first_payment'=>date('Y-m-d',strtotime($request->first_payment)),
                         'maturity_date'=>$request->maturity_date,
-                        'payment_per_sched'=>$amount_due
+                        'payment_per_sched'=>$amount_due,
+                        'transaction_id'=>$transaction->id,
+                        'balance'=>$loan->loan_amount + ($loan->loan_amount * ($loan->interest/100))
                     ]);
 
+                    
                     
                     // CLOSING ACCOUNT
                     Loan::where('byout_of',$request->id)->update(['status_id'=>7]);
@@ -329,7 +350,8 @@ class LoanController extends Controller
     }
 
     public function view_released(){
-        return view($this->dir.'released');
+        $charges = Charge::where('is_visible',1)->get();
+        return view($this->dir.'released',compact('charges'));
     }
 
 
@@ -345,6 +367,7 @@ class LoanController extends Controller
                         }]);
                     },
                     'schedule',
+                    'payment',
                     'category',
                     'payment_mode',
                     'term'

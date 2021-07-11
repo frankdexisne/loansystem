@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    return redirect()->route('login');
 });
 Route::resource('branches',App\Http\Controllers\Loans\BranchController::class);
 Route::post('branches/submit-fund',[App\Http\Controllers\Loans\BranchController::class,'submit_fund'])->name('branches.submit_fund');
@@ -42,7 +42,7 @@ Route::post('/users/reset-password/{id}',[App\Http\Controllers\System\UserContro
 Route::get('/loans/view-for-approval',[App\Http\Controllers\Loans\LoanController::class,'view_for_approval'])->name('loans.view-for-approval');
 Route::get('/loans/view-approved',[App\Http\Controllers\Loans\LoanController::class,'view_approved'])->name('loans.view-approved');
 Route::get('/loans/view-for-release',[App\Http\Controllers\Loans\LoanController::class,'view_for_release'])->name('loans.view-for-release');
-Route::get('/loans/view-released',[App\Http\Controllers\Loans\LoanController::class,'view_releases'])->name('loans.view-released');
+Route::get('/loans/view-released',[App\Http\Controllers\Loans\LoanController::class,'view_released'])->name('loans.view-released');
 
 Route::resource('loans',App\Http\Controllers\Loans\LoanController::class);
 Route::post('loans/approval',[App\Http\Controllers\Loans\LoanController::class,'approval'])->name('loans.approval');

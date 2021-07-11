@@ -194,7 +194,7 @@
                 total_deduction+=parseFloat(this.amount);
             });
             var net = parseFloat(d.loan_amount)-parseFloat(total_deduction);
-            console.log(net);
+            
             
             var generatedForm = '<form class="form-releasing" style="width:100%">';
             generatedForm += '<input type="hidden" name="id" value="'+d.id+'">';
@@ -202,7 +202,7 @@
             generatedForm += '<table style="width:100%" cellspacing="5">';
             generatedForm += '<tr>'+
                 '<td><label>Actual Releasing date</label></td>'+
-                '<td><input type="date" class="form-control" name="to_release_at" style="width:100%;margin-left:4px;" value="'+d.to_release_at+'" required></td>'+
+                '<td><input type="date" class="form-control" name="release_date" style="width:100%;margin-left:4px;" value="'+d.to_release_at+'" required></td>'+
                 '</tr>';
             generatedForm += '<tr>'+
             '<td><label>Actual First payment</label></td>'+
@@ -422,7 +422,8 @@
             dataTable.on('click','a.release',function(e){
                 var tr = $(this).closest('tr');
                 var row = dataTable.row( tr );
-        
+                var row_data = row.data();
+                console.log(row_data);
                 if ( row.child.isShown() ) {
                     row.child.hide();
                     tr.removeClass('shown');
@@ -434,6 +435,20 @@
                     dataTable.row( $prevTr.prev('tr') ).child.hide()
                     $prevTr.prev('tr').removeClass('shown');
                     row.child( formatReleasingForm(row.data()),'child-row' ).show();
+                    
+                    var charge_ids = [];
+                    $.each(row_data.loan_charge,function(){
+                        charge_ids.push(this.charge_id);
+                    });
+                    
+                    setTimeout(function(){
+                        $('.form-releasing').find('.table-charge').find('tbody').find('tr').each(function(){
+                        $tr = $(this);
+                        if(charge_ids.includes(parseInt($tr.find('td').eq(0).find('input[type="checkbox"]').val()))){
+                            $tr.find('td').eq(0).find('input[type="checkbox"]').prop('checked',true);
+                        }
+                    })
+                    },500);
                     
                 }
                 tr.removeClass('selected');
@@ -505,9 +520,10 @@
                 $this.find('table.table-active_loan tbody').find('tr').each(function(){
                     $td = $(this).find('td');
                     if($td.eq(0).find('input[type="checkbox"]').is(':checked')){
-                        byouts.push(
-                            $td.eq(0).find('input[type="checkbox"]').val()
-                        );
+                        byouts.push({
+                            charge_id : $td.eq(0).find('input[type="checkbox"]').val(),
+                            amount : $td.eq(2).find('input.amount').val()
+                        });
                     }
                 });
 
@@ -515,13 +531,13 @@
                 if($(this).valid()){
                     
                     $.ajax({
-                        url: "{{url('/loans/for-release')}}",
+                        url: "{{url('/loans/release')}}",
                         type: "POST",
                         dataType: "JSON",
                         data: {
                             _token: $('meta[name="csrf-token"]').attr('content'),
-                            loan_id : $this.find('input[name="id"]').val(),
-                            to_release_at: $this.find('input[name="to_release_at"]').val(),
+                            id : $this.find('input[name="id"]').val(),
+                            release_date: $this.find('input[name="release_date"]').val(),
                             first_payment: $this.find('input[name="first_payment"]').val(),
                             charges: charges,
                             byouts: byouts

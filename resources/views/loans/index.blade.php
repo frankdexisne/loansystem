@@ -666,7 +666,7 @@ $(document).ready(function(){
                     returnHTML += '<br>CBU : '+data['capital_build_up'];
                     return returnHTML;
                 }},
-                {data: 'loan_balance'},
+                {data: 'loan_balance'}
                 
                 
             ]
