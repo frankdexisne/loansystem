@@ -29,11 +29,22 @@ class RoleAndPermissionsSeeder extends Seeder
             }
         }
 
+        $administator_user = User::firstOrNew(['email'=>'frankdexisne1692@gmail.com']);
+        if(!$administator_user->exists){
+            $administator_user->fill([
+                'name'=>'Frankly Dexisne',
+                'password'=>'$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi'
+            ])
+            ->save();
+        }
+
         $system_administrator = Role::firstOrNew(['name'=>'SYSTEM ADMINISTRATOR']);
 
         if($system_administrator->exists){
-            $user = User::where('id',1)->first();
-            $user->assignRole('SYSTEM ADMINISTRATOR');
+            if(User::find($administator_user->id)){
+                $user = User::where('id',1)->first();
+                $user->assignRole('SYSTEM ADMINISTRATOR');
+            }
         }
 
         $modules = \Config::get('references.module');
