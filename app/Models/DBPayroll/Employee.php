@@ -13,6 +13,8 @@ class Employee extends Model
 
     protected $fillable = ['employee_no','avatar','lname','fname','mname','gender','job_title_id','branch_id'];
 
+    protected $appends = ['full_name'];
+
     public function job_title(){
         return $this->belongsTo('App\Models\DBPayroll\JobTitle');
     }
@@ -27,5 +29,9 @@ class Employee extends Model
 
     public function area(){
         return $this->belongsTo('App\Models\DBLoans\Area');
+    }
+
+    public function getFullNameAttribute(){
+        return $this->lname.', '.$this->fname.' '.$this->mname;
     }
 }

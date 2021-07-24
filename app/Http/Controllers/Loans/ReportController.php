@@ -20,7 +20,7 @@ class ReportController extends Controller
      */
     public function index()
     {
-        //
+        return view('loan.loans.report_generation');
     }
 
     /**
@@ -87,6 +87,28 @@ class ReportController extends Controller
     public function destroy($id)
     {
         //
+    }
+
+    public function closing_report(){
+        $branch = getWorkStation()->branch;
+        
+        if($branch->hasWallet('daily_coh')==false){
+            $branch->createWallet([
+                'name' => 'DAILY CASH ON HAND',
+                'slug' => 'daily_coh'
+            ]);
+        }
+        if($branch->hasWallet('weekly_coh')==false){
+            $branch->createWallet([
+                'name' => 'WEEKLY CASH ON HAND',
+                'slug' => 'weekly_coh'
+            ]);
+        }
+        $coh_daily = $branch->getWallet('daily_coh') ? $branch->getWallet('daily_coh')->balance : 0;
+        $coh_weekly = $branch->getWallet('weekly_coh') ? $branch->getWallet('weekly_coh')->balance : 0;
+        
+        return view('loan.loans.closing_report',compact('coh_daily','coh_weekly'));
+        
     }
 
     public function ncr(){

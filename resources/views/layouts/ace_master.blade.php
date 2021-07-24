@@ -72,6 +72,35 @@
 
 				<div class="navbar-buttons navbar-header pull-right" role="navigation">
 					<ul class="nav ace-nav">
+					<li class="purple dropdown-modal">
+							<a data-toggle="dropdown" class="dropdown-toggle" href="#">
+								<i class="ace-icon fa fa-bell icon-animated-bell"></i>
+								<span class="badge badge-important">8</span>
+							</a>
+
+							<ul class="dropdown-menu-right dropdown-navbar navbar-pink dropdown-menu dropdown-caret dropdown-close">
+								<li class="dropdown-header">
+									<i class="ace-icon fa fa-exclamation-triangle"></i>
+									8 Notifications
+								</li>
+
+								<li class="dropdown-content">
+									<ul class="dropdown-menu dropdown-navbar navbar-pink">
+										<li>
+											<a href="#">
+												<div class="clearfix">
+													<span class="pull-left">
+														<i class="btn btn-xs no-hover btn-danger fa fa-calendar"></i>
+														For Overdue
+													</span>
+													<span class="pull-right badge badge-danger">+12</span>
+												</div>
+											</a>
+										</li>
+									</ul>
+								</li>
+							</ul>
+						</li>
 						<li class="light-blue dropdown-modal">
 							<a data-toggle="dropdown" href="#" class="dropdown-toggle">
 							<img class="nav-user-photo" src="{{Auth::user()->avatar==null ? asset('/ace-master/images/avatars/profile-pic.jpg') : asset('/storage/users/'.Auth::user()->id.'.png')}}" />
@@ -174,9 +203,9 @@
 
 				</ul><!-- /.nav-list -->
 
-				<div class="sidebar-toggle sidebar-collapse" id="sidebar-collapse">
+				<!-- <div class="sidebar-toggle sidebar-collapse" id="sidebar-collapse">
 					<i id="sidebar-toggle-icon" class="ace-icon fa fa-angle-double-left ace-save-state" data-icon1="ace-icon fa fa-angle-double-left" data-icon2="ace-icon fa fa-angle-double-right"></i>
-				</div>
+				</div> -->
 			</div>
 
 			<div class="main-content">

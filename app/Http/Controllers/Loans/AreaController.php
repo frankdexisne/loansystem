@@ -100,7 +100,22 @@ class AreaController extends Controller
     }
 
     public function jsonData(Request $request){
-        $data = $request->has('reimburse_date') ? Area::where('for_daily_areas',$request->for_daily_areas)->with(['reimbursement'=>function($query) use($request){ $query->whereDate('reimburse_date',date('Y-m-d',strtotime($request->reimburse_date))); }])->get() : ($request->has('for_daily_areas') ? Area::where('for_daily_areas',$request->for_daily_areas)->orderBy('for_daily_areas','ASC')->get() : Area::get());
+        $data = null;
+        if($request->has('reimburse_date')){
+            $data = Area::where('for_daily_areas',$request->for_daily_areas)
+                        ->with([
+                            'reimbursement'=>function($query) use($request){ 
+                                $query->whereDate('reimburse_date',date('Y-m-d',strtotime($request->reimburse_date))); 
+                            }])
+                            ->get();
+        }else{
+            if($request->has('for_daily_areas')){
+                $data=Area::where('for_daily_areas',$request->for_daily_areas)->orderBy('for_daily_areas','ASC')->get();
+            }else{
+                $data = Area::get();
+            }
+        }
+         
         return AreaResource::collection($data);
     }
 

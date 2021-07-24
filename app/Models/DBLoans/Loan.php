@@ -11,7 +11,7 @@ class Loan extends Model
 
     protected $connection = 'mysql';
 
-    protected $fillable = ['client_id','category_id','term_id','payment_mode_id','status_id','transaction_code','date_loan','date_release','to_release_at','first_payment','maturity_date','loan_amount','interest','settled','balance','over','payment_per_sched','byout_of'];
+    protected $fillable = ['client_id','category_id','term_id','payment_mode_id','status_id','transaction_code','date_loan','date_release','transaction_id','to_release_at','first_payment','maturity_date','last_payment_date','loan_amount','interest','settled','balance','over','payment_per_sched','byout_of','is_renew'];
 
     protected $appends = ['date_loan_formatted','date_release_formatted','first_payment_formatted','maturity_date_formatted','loan_amount_formatted','balance_formatted','deduction_formatted','ps_formatted','cbu_formatted','total_byout_formatted'];
 

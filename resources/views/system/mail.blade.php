@@ -1,0 +1,1 @@
+Database backup as of {{date('Y-m-d H:i:s')}}

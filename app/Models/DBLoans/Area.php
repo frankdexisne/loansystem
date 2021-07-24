@@ -15,4 +15,8 @@ class Area extends Model
     public function reimbursement(){
         return $this->hasMany('App\Models\DBLoans\Reimbursement');
     }
+
+    public function client(){
+        return $this->hasMany('App\Models\DBLoans\Client');
+    }
 }

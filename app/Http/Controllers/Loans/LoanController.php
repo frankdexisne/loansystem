@@ -10,6 +10,8 @@ use App\Models\DBLoans\Status;
 use App\Models\DBLoans\Schedule;
 use App\Models\DBLoans\Charge;
 use App\Models\DBLoans\LoanCharge;
+use App\Models\DBLoans\Area;
+use App\Models\DBLoans\Payment;
 use App\Http\Resources\Loans\LoanResource;
 use App\Http\Requests\Loans\UpdateLoanRequest;
 use PDF;
@@ -110,7 +112,7 @@ class LoanController extends Controller
         $loan = Loan::firstOrNew(['id'=>$id]);
         if($loan->exists){
             if(in_array($loan->status_id,[1,2,3,5])){
-                Loan::where('id',$id)->update([
+                Loan::find($id)->update([
                     'category_id'=>$request->category_id,
                     'payment_mode_id'=>$request->payment_mode_id,
                     'term_id'=>$request->term_id,
@@ -310,7 +312,7 @@ class LoanController extends Controller
                     $transaction= $wallet->withdraw($loan->loan_amount-$total_deduction);
                     $wallet->refreshBalance();
 
-                    Loan::where('id',$request->id)->update([
+                    Loan::find($request->id)->update([
                         'status_id'=>$status->id,
                         'date_release'=>date('Y-m-d',strtotime($request->release_date)),
                         'first_payment'=>date('Y-m-d',strtotime($request->first_payment)),
@@ -378,7 +380,9 @@ class LoanController extends Controller
                     'term'
                 ])
                 ->get();
-            
+
+
+        
         return LoanResource::collection($data);
     }
 
@@ -482,13 +486,14 @@ class LoanController extends Controller
 
     public function jsonDataGetReleases(Request $request){
         $data = Loan::whereDate('date_release',date('Y-m-d',strtotime($request->date_release)))
-                    // ->where('payment_mode_id',$request->payment_mode_id)
+                    ->where('payment_mode_id',$request->payment_mode_id)
                     // ->join('clients','clients.id','=','loans.client_id')
                     // ->join('areas','areas.id','=','clients.area_id')
                     ->with(['client'=>function($query){ $query->with('area'); },'loan_charge'])
                     ->get();
                     // ->get([DB::raw("CONCAT(clients.lname,', ',clients.fname,' ',clients.mname) AS full_name"),'balance','loan_amount','areas.name']);
         return LoanResource::collection($data);
+        
     }
 
     public function jsonActiveLoans(Request $request){
@@ -584,5 +589,81 @@ class LoanController extends Controller
         }else{
             abort(404);
         }
+    }
+
+    public function sales_monitoring_pdf($payment_mode_id,$date){
+        $loan=Loan::where(function($query) use($date){
+                        $query->where('to_release_at',$date)->orWhere('date_release',$date);
+                    })
+                    ->where('payment_mode_id',$payment_mode_id)
+                   ->whereHas('status',function($query){ 
+                      $query->whereIn('name',['FOR RELEASE','RELEASED']); 
+                   })
+                   ->join('clients','clients.id','=','loans.client_id')
+                   ->leftJoin('loan_charges','loan_charges.loan_id','=','loans.id')
+                   ->select(['loans.*','clients.lname','clients.fname','clients.mname','clients.area_id',DB::raw('SUM(loan_charges.amount) AS total_deduction')])
+                   ->groupBy('loan_charges.loan_id')
+                   ->get()->toArray();
+        
+        $areas = Area::whereIn('id',array_unique(array_column($loan,'area_id')))->get();
+        
+        $data = [];
+        
+        foreach($areas as $area){
+            $loan_filtered = array_filter($loan,function($arr) use($area){
+                return $arr['area_id']==$area->id ? true : false;
+            });
+            array_push($data,[
+                'area'=>$area->name,
+                'loans'=>$loan_filtered
+            ]);
+        }
+
+        
+        $view = \View::make('loan.loans.sales_monitoring',compact('data','date','payment_mode_id'));
+        $html = $view->render();
+        PDF::SetTitle('SALES MONITORING');
+        PDF::AddPage('L','LEGAL');
+        PDF::SetFont('times','N',11);
+        PDF::writeHTML($html, true, false, true, false, '');
+        PDF::Output('SALES MONITORING-'.$date.'.pdf');
+    }
+
+    public function collection_report_pdf($payment_mode_id,$date){
+        $payments = Payment::where('payment_date',$date)
+                            ->join('clients','clients.id','=','payments.client_id')
+                            ->leftJoin('addresses','addresses.client_id','=','clients.id')
+                            ->leftJoin('dbsystem.philippine_barangays','dbsystem.philippine_barangays.id','=','addresses.philippine_barangay_id')
+                            ->leftJoin('dbsystem.philippine_cities','dbsystem.philippine_cities.city_municipality_code','=','dbsystem.philippine_barangays.city_municipality_code')
+                            ->leftJoin('dbsystem.philippine_provinces','dbsystem.philippine_provinces.province_code','=','dbsystem.philippine_cities.province_code')
+                            ->leftJoin('transactions AS ps_transaction','ps_transaction.id','=','payments.ps_id')
+                            ->leftJoin('transactions AS cbu_transaction','cbu_transaction.id','=','payments.cbu_id')
+                            ->get(['payments.*',DB::raw("CONCAT(clients.lname,', ',clients.fname,' ',clients.mname) AS client_name"),'clients.area_id',DB::raw("CONCAT(street,', ',barangay_description,', ',city_municipality_description,', ',province_description) AS full_address")])->toArray();
+        
+
+        $areas = Area::whereIn('id',array_unique(array_column($payments,'area_id')))->get();
+        
+        $data = [];
+        
+        foreach($areas as $area){
+            $payment_filtered = array_filter($payments,function($arr) use($area){
+                return $arr['area_id']==$area->id ? true : false;
+            });
+
+            array_push($data,[
+                'area'=>$area->name,
+                'subdata'=>$payment_filtered
+            ]);
+        }
+
+        
+
+        $view = \View::make('loan.loans.collection_report',compact('data','date','payment_mode_id'));
+        $html = $view->render();
+        PDF::SetTitle('COLLECTION REPORT');
+        PDF::AddPage('L','LEGAL');
+        PDF::SetFont('times','N',11);
+        PDF::writeHTML($html, true, false, true, false, '');
+        PDF::Output('COLLECTION REPORT-'.$date.'.pdf');
     }
 }

@@ -48,7 +48,7 @@ class Payment extends Model
     }
 
     public function getCbuAmountAttribute(){
-        return $this->ps_id!=null ? number_format($this->ps->amount,2,'.',',') : 0;
+        return $this->cbu_id!=null ? number_format($this->cbu->amount,2,'.',',') : 0;
     }
 
     public function getInsAmountAttribute(){

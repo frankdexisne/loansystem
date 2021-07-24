@@ -109,7 +109,7 @@ class EmployeeController extends Controller
     }
 
     public function jsonData(Request $request){
-        $data = Employee::with(['job_title','branch','user'=>function($query){ $query->with(['model_has_role'=>function($query){ $query->with('role'); }]); },'area'])->get();
+        $data = Employee::whereHas('job_title',function($query) use($request){ if($request->has('job_title')){ $query->where('name',$request->job_title); } })->with(['job_title','branch','user'=>function($query){ $query->with(['model_has_role'=>function($query){ $query->with('role'); }]); },'area'])->get();
         return EmployeeResource::collection($data);        
     }
 

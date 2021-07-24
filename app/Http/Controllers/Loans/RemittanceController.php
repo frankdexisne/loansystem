@@ -11,6 +11,10 @@ use App\Models\DBLoans\Reimbursement;
 class RemittanceController extends Controller
 {
     private $dir = 'loan.remittances.';
+
+    public function __construct(){
+        $this->middleware('auth');
+    }
     /**
      * Display a listing of the resource.
      *

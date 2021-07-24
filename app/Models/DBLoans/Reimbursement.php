@@ -11,5 +11,15 @@ class Reimbursement extends Model
     
     protected $connection = 'mysql';
 
-    protected $fillable = ['daily_transaction_report_id','area_id','reimburse_date','created_at','updated_at'];
+    protected $fillable = ['daily_transaction_report_id','area_id','employee_id','reimburse_date','created_at','updated_at'];
+
+    protected $appends = ['total_collection'];
+
+    public function payment(){
+        return $this->hasMany('App\Models\DBLoans\Payment');
+    }
+
+    public function getTotalCollectionAttribute(){
+        return number_format($this->payment->sum('amount'),2,'.',',');
+    }
 }

@@ -248,7 +248,7 @@ class PaymentController extends Controller
                     
                     ->get();
         return LoanResource::collection($data);
-
+                    
         // $data = Payment::whereHas('loan',function($query) use($request){
         //                     $query->whereHas()
         //                 })

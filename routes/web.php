@@ -12,9 +12,18 @@ use Illuminate\Support\Facades\Route;
 | contains the "web" middleware group. Now create something great!
 |
 */
-
+use Illuminate\Support\Facades\Storage;
 Route::get('/', function () {
     return redirect()->route('login');
+    // $path = base_path().'\\storage\\app\\LoanSystem';
+    // $files = scandir($path, SCANDIR_SORT_DESCENDING);
+    // $newest_file = $files[0];
+    // $data = [];
+    // Mail::send('system.email_message',$data, function($message) use($newest_file){
+    //     $message->to('frankdexisne1692@gmail.com','Frankly Dexisne')->subject(env('MAIL_SUBJECT'));
+    //     $message->from(env('MAIL_USERNAME'),env('MAIL_NAME'));
+    //     $message->attachData($newest_file, "backup.pdf");
+    // });
 });
 Route::resource('branches',App\Http\Controllers\Loans\BranchController::class);
 Route::post('branches/submit-fund',[App\Http\Controllers\Loans\BranchController::class,'submit_fund'])->name('branches.submit_fund');
@@ -54,6 +63,9 @@ Route::post('loans/release',[App\Http\Controllers\Loans\LoanController::class,'r
 Route::get('loans/voucher/{id}',[App\Http\Controllers\Loans\LoanController::class,'voucher'])->name('loans.voucher');
 Route::get('loans/soa/{id}',[App\Http\Controllers\Loans\LoanController::class,'soa'])->name('loans.soa');
 
+Route::get('/loans/sales-monitoring-pdf/{payment_mode_id}/{date}',[App\Http\Controllers\Loans\LoanController::class,'sales_monitoring_pdf'])->name('loans.sales_monitoring_pdf');
+Route::get('/loans/collection-report-pdf/{payment_mode_id}/{date}',[App\Http\Controllers\Loans\LoanController::class,'collection_report_pdf'])->name('loans.collection_report_pdf');
+
 Route::get('/remittances/json-payments',[App\Http\Controllers\Loans\RemittanceController::class,'jsonPayment'])->name('remittances.jsonPayment');
 Route::resource('remittances',App\Http\Controllers\Loans\RemittanceController::class);
 
@@ -73,6 +85,7 @@ Route::get('/reports/sales-report',[App\Http\Controllers\Loans\ReportController:
 Route::get('/reports/loan-report',[App\Http\Controllers\Loans\ReportController::class,'lr'])->name('reports.lr');
 Route::get('/reports/withdrawal-report',[App\Http\Controllers\Loans\ReportController::class,'wr'])->name('reports.wr');
 Route::get('/reports/expense-report',[App\Http\Controllers\Loans\ReportController::class,'er'])->name('reports.er');
+Route::get('/reports/closing-report',[App\Http\Controllers\Loans\ReportController::class,'closing_report'])->name('reports.closing_report');
 
 Route::get('/reports/note-collection-report-json',[App\Http\Controllers\Loans\ReportController::class,'ncr_json'])->name('reports.ncr-json');
 Route::get('/reports/target-performance-report-json',[App\Http\Controllers\Loans\ReportController::class,'tpr_json'])->name('reports.tpr-json');
@@ -83,6 +96,8 @@ Route::get('/reports/withdrawal-report-json',[App\Http\Controllers\Loans\ReportC
 Route::get('/reports/expense-report-json',[App\Http\Controllers\Loans\ReportController::class,'er_json'])->name('reports.er-json');
 
 Route::resource('reports',App\Http\Controllers\Loans\ReportController::class);
+
+Route::resource('daily-transactions',App\Http\Controllers\Loans\DailyTransactionController::class);
 
 Route::get('/references', function () {
     

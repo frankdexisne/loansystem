@@ -22,7 +22,26 @@
     </li>
     <li class="active">For releasing</li>
 </ul>
-
+<div class="nav-search" id="nav-search">
+    <form id="form-search" class="form-search form-inline">
+        <div class="form-group">
+            <!-- <input type="date" placeholder="Search ..." class="nav-search-input" id="nav-search-input" autocomplete="off" value="{{date('Y-m-d')}}"/> -->
+            <!-- <label for="">Report Type</label> -->
+            <select name="payment_mode_id" id="" class="form-control">
+                <option value="none" selected disabled>--Please select payment mode--</option>
+                <option value="1">Daily</option>
+                <option value="2">Weekly</option>
+            </select>
+            <!-- <i class="ace-icon fa fa-search nav-search-icon"></i> -->
+        </div>
+        <div class="form-group">
+            <input type="date" name="to_date_release" class="form-control" value="{{date('Y-m-d')}}">
+        </div>
+        <div class="form-group">
+            <button type="submit" class="dt-button btn btn-white btn-primary btn-bold print"><span><i class="fa fa-print bigger-110 grey"></i> <span class="">Print</span></span></button>
+        </div>
+    </form>
+</div> 
 @endsection
 
 @section('content')
@@ -119,6 +138,17 @@
 						'</div>';
             }},
         ];
+
+        $('#form-search').off('submit');
+
+        $('#form-search').on('submit',function(e){
+            e.preventDefault();
+            if($(this).find('select').val()=="none"){
+                alert('Please select payment mode');
+            }else{
+                window.open("{{url('/loans/sales-monitoring-pdf')}}/"+$(this).find('select').val()+'/'+$(this).find('input').val(),"_blank");
+            }
+        })
 
         function formatCreateLoan(d){
             
@@ -293,18 +323,18 @@
                 }
             })
 
-            $.fn.dataTable.Buttons.defaults.dom.container.className = 'dt-buttons btn-overlap btn-group btn-overlap';
+            // $.fn.dataTable.Buttons.defaults.dom.container.className = 'dt-buttons btn-overlap btn-group btn-overlap';
 				
-            new $.fn.dataTable.Buttons( dataTable, {
-                buttons: [
-                    {
-                    "text": "<i class='fa fa-print bigger-110 grey'></i> <span class=''>Print</span>",
-                    "className": "btn btn-white btn-primary btn-bold print",
-                    }		  
-                ]
-            } );
+            // new $.fn.dataTable.Buttons( dataTable, {
+            //     buttons: [
+            //         {
+            //         "text": "<i class='fa fa-print bigger-110 grey'></i> <span class=''>Print</span>",
+            //         "className": "btn btn-white btn-primary btn-bold print",
+            //         }		  
+            //     ]
+            // } );
 
-            dataTable.buttons().container().appendTo( $('.tableTools-container') );
+            // dataTable.buttons().container().appendTo( $('.tableTools-container') );
 
             
 

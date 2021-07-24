@@ -108,7 +108,15 @@
                 </thead>
 
                 <tfoot>
-                    <th><button type="button" id="button-remittance" class="btn btn-primary btn-sm">REMIT THIS COLLECTION</button></th>
+                    <th>
+                        <div class="form-group">
+                            <label for="">CREDIT OFFICER</label>
+                            <select name="employee_id" id="employee_id" class="form-control">
+                            </select>
+                        </div>
+                        
+                        <button type="button" id="button-remittance" class="btn btn-primary btn-sm">REMIT THIS COLLECTION</button>
+                    </th>
                     <th></th>
                     <th></th>
                     <th></th>
@@ -207,6 +215,27 @@
             })
         })
 
+        function loadCreditOfficers(){
+            $('#employee_id').html('');
+            $.ajax({
+                url: "{{url('employees-json')}}",
+                type: "GET",
+                dataType: 'JSON',
+                data: {
+                    // job_title : 'CREDIT OFFICER'
+                },
+                success: function(result){
+                    $data = result.data;
+                    $.each($data, function() {
+                        $('#employee_id').append($("<option  />").val(this['id']).text(this['lname']+', '+this['fname']+' '+this['mname']));
+                    });
+                    
+                }
+            })
+        }
+
+        loadCreditOfficers();
+
         function generateTable($element,ajaxUrl,ajaxType,ajaxData,_columns){
 
             if($.fn.DataTable.isDataTable( $element )){
@@ -283,7 +312,8 @@
                                 data: {
                                     _token : $('meta[name="csrf-token"]').attr('content'),
                                     payment_ids : payment_ids,
-                                    area_id : $('form').find('select').val()
+                                    area_id : $('form').find('select').val(),
+                                    employee_id : $('#employee_id').val()
                                 },
                                 success: function(res){
                                     Swal.fire(
